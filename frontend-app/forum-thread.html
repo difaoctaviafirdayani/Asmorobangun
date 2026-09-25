@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diskusi — Asmorobangun</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="app-shell">
+  <div class="back-row"><button class="back-btn" onclick="location.href='forum.html'">←</button></div>
+  <div id="content" class="section">Memuat...</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+const thid = new URLSearchParams(location.search).get("id");
+async function load() {
+  const { thread: t } = await api(`/forum/${thid}`);
+  document.title = t.title + " — Forum Asmorobangun";
+  document.getElementById("content").innerHTML = `
+    <div class="th-cat">${t.category}</div>
+    <h2 style="margin-top:6px">${t.title}</h2>
+    <div class="th-meta">${t.userName} · ${formatDate(t.date)}</div>
+    <p style="margin-top:12px">${t.content}</p>
+
+    <div class="section-head" style="margin-top:16px"><h3 style="font-size:0.95rem">${t.replies.length} Balasan</h3></div>
+    <div id="replies">
+      ${t.replies.map((r) => `<div class="reply-bubble ${r.userName === 'Admin Sanggar' ? 'admin' : ''}">
+        <div class="rb-name">${r.userName}${r.userName === 'Admin Sanggar' ? ' · Admin' : ''}</div>
+        <div>${r.content}</div>
+        <div class="th-meta" style="margin-top:4px">${formatDate(r.date)}</div>
+      </div>`).join("") || `<div class="empty-state">Belum ada balasan.</div>`}
+    </div>
+
+    <div class="field" style="margin-top:14px">
+      ${isLoggedIn()
+        ? `<textarea id="replyInput" rows="2" placeholder="Tulis balasan..."></textarea>
+           <button class="btn btn-primary" style="margin-top:8px" onclick="sendReply()">Kirim Balasan</button>`
+        : `<div class="card card-pad"><a href="login.html">Masuk</a> untuk membalas diskusi ini.</div>`}
+    </div>
+  `;
+}
+async function sendReply() {
+  const content = document.getElementById("replyInput").value.trim();
+  if (!content) return;
+  try {
+    await api(`/forum/${thid}/replies`, { method: "POST", auth: true, body: { content } });
+    load();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+load();
+renderChrome("forum");
+</script>
+</body>
+</html>

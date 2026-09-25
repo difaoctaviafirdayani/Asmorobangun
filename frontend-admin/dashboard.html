@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Admin Asmorobangun</title>
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<div class="admin-shell">
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1 id="greeting">Sugeng Rawuh, Admin!</h1>
+        <p id="todayInfo"></p>
+      </div>
+    </div>
+
+    <div class="stat-grid" id="statGrid"></div>
+
+    <div class="panel">
+      <div class="panel-head"><h3>Pendaftar terbaru</h3><a class="btn btn-outline btn-sm" href="data-pendaftar.html">Lihat semua</a></div>
+      <div class="panel-body">
+        <table>
+          <thead><tr><th>Nama</th><th>Layanan</th><th>Tanggal</th><th>Status</th></tr></thead>
+          <tbody id="recentBody"><tr><td colspan="4">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+document.getElementById("todayInfo").textContent = "Statistik aktivitas sanggar bulan ini · " + new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+async function load() {
+  try {
+    const s = await api("/admin/stats");
+    document.getElementById("statGrid").innerHTML = `
+      <div class="stat-card"><div class="s-label">Total Pendaftar</div><div class="s-value">${s.totalPendaftar}</div></div>
+      <div class="stat-card"><div class="s-label">Booking Bulan Ini</div><div class="s-value">${s.bookingsThisMonth}</div></div>
+      <div class="stat-card"><div class="s-label">Pesanan Topeng Bulan Ini</div><div class="s-value">${s.ordersThisMonth}</div></div>
+      <div class="stat-card"><div class="s-label">Kelas Terpopuler</div><div class="s-value" style="font-size:1.1rem">${s.popularFacility}</div></div>
+      <div class="stat-card"><div class="s-label">Menunggu Verifikasi Bayar</div><div class="s-value">${s.pendingReview}</div></div>
+      <div class="stat-card"><div class="s-label">Total Pengguna Terdaftar</div><div class="s-value">${s.totalUsers}</div></div>
+    `;
+    document.getElementById("recentBody").innerHTML = s.recentRegistrants.length
+      ? s.recentRegistrants.map((r) => {
+          const [label, tone] = statusLabel(r.status);
+          return `<tr><td><strong>${r.name}</strong><br/><span style="color:var(--ink-soft);font-size:0.78rem">${r.email}</span></td><td>${r.facility}</td><td>${formatDate(r.date)}</td><td><span class="status-chip ${tone}">${label}</span></td></tr>`;
+        }).join("")
+      : `<tr><td colspan="4" class="empty-state">Belum ada pendaftar.</td></tr>`;
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+load();
+renderSidebar("dashboard");
+</script>
+</body>
+</html>

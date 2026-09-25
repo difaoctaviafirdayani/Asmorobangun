@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Asmorobangun Admin</title></head>
+<body>
+<script src="js/api.js"></script>
+<script>
+window.location.href = (authToken() && currentAdmin()) ? "dashboard.html" : "login.html";
+</script>
+</body></html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Masuk Admin — Asmorobangun</title>
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="wordmark">asmorobangun</div>
+    <div class="tagline">Dashboard Admin Sanggar</div>
+    <form id="loginForm">
+      <div class="field"><label>Email</label><input type="email" id="email" required value="admin@asmorobangun.id" /></div>
+      <div class="field"><label>Password</label><input type="password" id="password" required placeholder="Password" /></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" type="submit">Masuk ke Dashboard</button>
+    </form>
+    <p style="text-align:center;font-size:0.72rem;color:var(--ink-soft);margin-top:16px">Demo: admin@asmorobangun.id / admin123</p>
+    <p style="text-align:center;font-size:0.75rem;margin-top:10px"><a href="../frontend-app/index.html" style="color:var(--wood-800);font-weight:600">← Kembali ke situs utama</a></p>
+  </div>
+</div>
+<script src="js/api.js"></script>
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  try {
+    const data = await api("/auth/login", { method: "POST", body: { email, password } });
+    if (data.user.role !== "admin") { showToast("Akun ini bukan admin."); return; }
+    setSession(data.token, data.user);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    showToast(err.message);
+  }
+});
+</script>
+</body>
+</html>

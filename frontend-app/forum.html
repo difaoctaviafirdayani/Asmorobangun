@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forum Diskusi — Asmorobangun</title>
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .new-thread-fab {
+    position: fixed; right: max(16px, calc(50% - var(--app-max)/2 + 16px)); bottom: calc(var(--nav-h) + 16px);
+    background: var(--wood-800); color: #fff; border: none; border-radius: 999px; padding: 13px 20px;
+    font-weight: 700; font-size: 0.86rem; box-shadow: 0 6px 18px rgba(44,28,18,0.35); z-index: 45;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .new-thread-sheet { position: fixed; inset: 0; background: rgba(20,13,8,0.55); z-index: 90; display:none; justify-content:center; align-items:flex-end; }
+  .new-thread-sheet.open { display:flex; }
+  .nts-card { width:100%; max-width: var(--app-max); background: var(--cream-100); border-radius: 20px 20px 0 0; padding: 18px; max-height: 85vh; overflow-y:auto; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="topbar-row">
+      <button class="icon-btn" onclick="location.href='index.html'">←</button>
+      <div class="wordmark" style="font-size:1.05rem">Forum Diskusi</div>
+      <button class="icon-btn" onclick="openSearch()">🔍</button>
+    </div>
+  </div>
+  <div class="section" style="display:flex;gap:8px;overflow-x:auto" id="catRow"></div>
+  <div class="section" id="threadList">Memuat...</div>
+</div>
+
+<button class="new-thread-fab" onclick="openNewThread()" style="bottom:calc(var(--nav-h) + 84px)">✏️ Diskusi Baru</button>
+
+<div class="new-thread-sheet" id="ntSheet">
+  <div class="nts-card">
+    <h3>Mulai diskusi baru</h3>
+    <div class="field"><label>Kategori</label>
+      <select id="ntCategory"><option>Diskusi Umum</option><option>Kelas Tari</option><option>Karawitan</option><option>Topeng</option><option>Acara & Booking</option></select>
+    </div>
+    <div class="field"><label>Judul</label><input id="ntTitle" placeholder="Judul diskusi"/></div>
+    <div class="field"><label>Isi</label><textarea id="ntContent" rows="3" placeholder="Tulis pertanyaan atau cerita kamu..."></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="closeNewThread()">Batal</button>
+      <button class="btn btn-primary" onclick="submitThread()">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+let activeCat = "";
+async function loadCats() {
+  const { categories } = await api("/forum/categories");
+  const row = document.getElementById("catRow");
+  const chip = (label, val) => `<button class="tag" style="background:${val===activeCat?'var(--wood-800)':'var(--cream-300)'};color:${val===activeCat?'#fff':'var(--wood-900)'};border:none;white-space:nowrap" onclick="setCat('${val}')">${label}</button>`;
+  row.innerHTML = chip("Semua", "") + categories.map((c) => chip(c, c)).join("");
+}
+function setCat(c) { activeCat = c; loadCats(); loadThreads(); }
+
+async function loadThreads() {
+  const params = new URLSearchParams();
+  if (activeCat) params.set("category", activeCat);
+  const { threads } = await api(`/forum?${params.toString()}`);
+  document.getElementById("threadList").innerHTML = threads.length
+    ? threads.map((t) => `<a class="thread-item" style="display:block" href="forum-thread.html?id=${t.id}">
+        <div class="th-cat">${t.category}</div>
+        <div class="th-title">${t.title}</div>
+        <div class="th-meta">${t.userName} · ${formatDate(t.date)} · 💬 ${t.replyCount} balasan</div>
+      </a>`).join("")
+    : `<div class="empty-state"><div class="e-icon">💬</div>Belum ada diskusi. Jadilah yang pertama!</div>`;
+}
+
+function openNewThread() {
+  if (!requireLoginOrRedirect()) return;
+  document.getElementById("ntSheet").classList.add("open");
+}
+function closeNewThread() { document.getElementById("ntSheet").classList.remove("open"); }
+
+async function submitThread() {
+  const title = document.getElementById("ntTitle").value.trim();
+  const content = document.getElementById("ntContent").value.trim();
+  const category = document.getElementById("ntCategory").value;
+  if (!title || !content) return showToast("Judul dan isi wajib diisi.");
+  try {
+    const { thread } = await api("/forum", { method: "POST", auth: true, body: { title, content, category } });
+    closeNewThread();
+    location.href = `forum-thread.html?id=${thread.id}`;
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+loadCats();
+loadThreads();
+renderChrome("forum");
+</script>
+</body>
+</html>

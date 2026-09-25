@@ -1,0 +1,6 @@
+node_modules/
+.env
+uploads/payment_proof/*
+!uploads/payment_proof/.gitkeep
+uploads/chat_attachment/*
+!uploads/chat_attachment/.gitkeep

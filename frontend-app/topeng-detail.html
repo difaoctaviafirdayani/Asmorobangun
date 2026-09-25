@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Topeng — Asmorobangun</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="app-shell">
+  <div class="back-row"><button class="back-btn" onclick="location.href='topeng.html'">←</button></div>
+  <div id="content" class="section">Memuat...</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+const tid = new URLSearchParams(location.search).get("id");
+async function load() {
+  const { topeng: t } = await api(`/topeng/${tid}`);
+  document.title = t.name + " — Asmorobangun";
+  document.getElementById("content").innerHTML = `
+    <img class="detail-hero" style="border-radius:16px" src="assets/${t.image}" onerror="this.src='https://images.unsplash.com/photo-1601924582970-9238bcb495d9?w=700'"/>
+    <div style="margin-top:14px">
+      <h2>${t.name}</h2>
+      <div style="font-size:0.85rem;color:var(--ink-soft)">${t.character} · Warna dominan: ${t.color}</div>
+      <div style="font-weight:700;color:var(--wood-800);font-size:1.2rem;margin:10px 0">${formatRupiah(t.price)}</div>
+      <p>${t.desc}</p>
+      <div class="field-hint">Stok tersedia: ${t.stock}</div>
+    </div>
+
+    <div class="section" style="padding:16px 0 0">
+      <div class="section-head"><h3>Pesan topeng ini</h3></div>
+      ${!isLoggedIn() ? `<div class="card card-pad" style="background:#fbeecc;margin-bottom:12px"><a href="login.html">Masuk</a> dulu untuk memesan.</div>` : ""}
+      <div class="card card-pad" id="orderCard" style="${!isLoggedIn() ? "opacity:0.5;pointer-events:none" : ""}">
+        <div class="field"><label>Jumlah</label><input type="number" id="qty" value="1" min="1" /></div>
+        <div class="field">
+          <label><input type="checkbox" id="wantCustom" onchange="toggleCustom()" /> Saya ingin request nama/desain custom</label>
+        </div>
+        <div id="customFields" style="display:none">
+          <div class="field"><label>Nama custom (untuk diukir/label)</label><input id="customName" placeholder="mis. nama penerima hadiah" /></div>
+          <div class="field"><label>Detail desain custom</label><textarea id="customDesign" rows="2" placeholder="Jelaskan warna/karakter/detail yang diinginkan"></textarea></div>
+        </div>
+        <div class="field"><label>Nomor WhatsApp kamu</label><input id="buyerPhone" placeholder="08xxxxxxxxxx" /></div>
+        <div class="field"><label>Catatan tambahan</label><textarea id="message" rows="2" placeholder="Pesan untuk admin (opsional)"></textarea></div>
+        <button class="btn btn-primary" onclick="submitOrder()">🛒 Pesan &amp; Lanjut Chat</button>
+      </div>
+    </div>
+  `;
+}
+function toggleCustom() {
+  document.getElementById("customFields").style.display = document.getElementById("wantCustom").checked ? "block" : "none";
+}
+async function submitOrder() {
+  if (!requireLoginOrRedirect()) return;
+  const body = {
+    qty: document.getElementById("qty").value,
+    customName: document.getElementById("wantCustom").checked ? document.getElementById("customName").value : null,
+    customDesign: document.getElementById("wantCustom").checked ? document.getElementById("customDesign").value : null,
+    buyerPhone: document.getElementById("buyerPhone").value,
+    message: document.getElementById("message").value,
+  };
+  try {
+    const { order } = await api(`/topeng/${tid}/order`, { method: "POST", auth: true, body });
+    showToast("Pesanan dibuat, lanjut chat dengan admin!");
+    location.href = `order-chat.html?id=${order.id}`;
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+load();
+renderChrome("topeng");
+</script>
+</body>
+</html>

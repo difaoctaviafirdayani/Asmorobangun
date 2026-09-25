@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kelola Topeng — Admin Asmorobangun</title>
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<div class="admin-shell">
+  <main class="main">
+    <div class="page-head">
+      <div><h1>Kelola Topeng</h1><p>Atur katalog topeng yang dijual di toko online sanggar.</p></div>
+      <button class="btn btn-primary" onclick="openNew()">+ Tambah Topeng</button>
+    </div>
+    <div class="card-list" id="list">Memuat...</div>
+  </main>
+</div>
+
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h3 id="modalTitle">Tambah Topeng</h3>
+    <input type="hidden" id="editId" />
+    <div class="grid-2">
+      <div class="field"><label>Nama Topeng</label><input id="fName" /></div>
+      <div class="field"><label>Harga (Rp)</label><input id="fPrice" type="number" /></div>
+      <div class="field"><label>Karakter/Watak</label><input id="fCharacter" /></div>
+      <div class="field"><label>Warna dominan</label><input id="fColor" /></div>
+      <div class="field"><label>Stok</label><input id="fStock" type="number" /></div>
+      <div class="field"><label>Nama file gambar</label><input id="fImage" placeholder="topeng-x.jpg" /></div>
+    </div>
+    <div class="field"><label>Deskripsi</label><textarea id="fDesc" rows="3"></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" onclick="save()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+async function load() {
+  const { topeng } = await api("/topeng");
+  document.getElementById("list").innerHTML = topeng.map((t) => `
+    <div class="thumb-list-item">
+      <img src="../frontend-app/assets/${t.image}" onerror="this.src='https://images.unsplash.com/photo-1601924582970-9238bcb495d9?w=200'"/>
+      <div style="flex:1">
+        <strong>${t.name}</strong> <span style="color:var(--ink-soft);font-size:0.78rem">· ${t.character}</span>
+        <div style="font-size:0.85rem;font-weight:600;color:var(--wood-800)">${formatRupiah(t.price)} · Stok ${t.stock}</div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick='openEdit(${JSON.stringify(t).replace(/'/g, "&apos;")})'>Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="del('${t.id}')">Hapus</button>
+    </div>
+  `).join("") || `<div class="empty-state">Belum ada topeng di katalog.</div>`;
+}
+function openNew() {
+  document.getElementById("modalTitle").textContent = "Tambah Topeng";
+  ["editId","fName","fPrice","fCharacter","fColor","fStock","fImage","fDesc"].forEach((id) => document.getElementById(id).value = "");
+  document.getElementById("editModal").classList.add("open");
+}
+function openEdit(t) {
+  document.getElementById("modalTitle").textContent = "Edit: " + t.name;
+  document.getElementById("editId").value = t.id;
+  document.getElementById("fName").value = t.name;
+  document.getElementById("fPrice").value = t.price;
+  document.getElementById("fCharacter").value = t.character;
+  document.getElementById("fColor").value = t.color;
+  document.getElementById("fStock").value = t.stock;
+  document.getElementById("fImage").value = t.image;
+  document.getElementById("fDesc").value = t.desc;
+  document.getElementById("editModal").classList.add("open");
+}
+function closeModal() { document.getElementById("editModal").classList.remove("open"); }
+async function save() {
+  const id = document.getElementById("editId").value;
+  const body = {
+    name: document.getElementById("fName").value,
+    price: document.getElementById("fPrice").value,
+    character: document.getElementById("fCharacter").value,
+    color: document.getElementById("fColor").value,
+    stock: document.getElementById("fStock").value,
+    image: document.getElementById("fImage").value,
+    desc: document.getElementById("fDesc").value,
+  };
+  try {
+    if (id) await api(`/topeng/${id}`, { method: "PATCH", body });
+    else await api("/topeng", { method: "POST", body });
+    showToast("Tersimpan.");
+    closeModal();
+    load();
+  } catch (err) { showToast(err.message); }
+}
+async function del(id) {
+  if (!confirm("Hapus topeng ini dari katalog?")) return;
+  try { await api(`/topeng/${id}`, { method: "DELETE" }); showToast("Dihapus."); load(); }
+  catch (err) { showToast(err.message); }
+}
+load();
+renderSidebar("topeng");
+</script>
+</body>
+</html>

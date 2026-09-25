@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fasilitas — Asmorobangun</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="app-shell">
+  <div class="back-row">
+    <button class="back-btn" onclick="location.href='facilities.html'">←</button>
+  </div>
+  <div id="content" class="section">Memuat...</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+const fid = new URLSearchParams(location.search).get("id");
+let FACILITY = null;
+
+async function load() {
+  try {
+    const { facility, reviews } = await api(`/facilities/${fid}`);
+    FACILITY = facility;
+    document.title = facility.name + " — Asmorobangun";
+    document.getElementById("content").innerHTML = `
+      <img class="detail-hero" style="border-radius:16px" src="assets/${facility.image}" onerror="this.src='https://images.unsplash.com/photo-1583225214464-9296029427aa?w=700'"/>
+      <div style="margin-top:14px">
+        <span class="tag">${facility.category}</span>
+        <h2 style="margin-top:8px">${facility.name}</h2>
+        ${facility.avgRating ? `<div class="stars">${stars(facility.avgRating)} <span style="color:var(--ink-soft);font-size:0.78rem">${facility.avgRating} (${facility.reviewCount} ulasan)</span></div>` : `<div style="font-size:0.78rem;color:var(--ink-soft)">Belum ada ulasan</div>`}
+        <p style="margin-top:10px">${facility.longDesc}</p>
+        <div class="card card-pad" style="background:var(--cream-300);border:none;margin:14px 0">
+          <strong style="font-size:0.85rem">💰 ${facility.priceInfo}</strong>
+        </div>
+      </div>
+
+      <div id="bookingSection"></div>
+
+      <div class="section" style="padding:20px 0 0">
+        <div class="section-head"><h3>Ulasan pendaftar</h3></div>
+        <div id="reviewForm"></div>
+        <div id="reviewList">${renderReviews(reviews)}</div>
+      </div>
+    `;
+    renderBookingForm(facility);
+    renderReviewForm();
+  } catch (err) {
+    document.getElementById("content").innerHTML = `<div class="empty-state">Fasilitas tidak ditemukan.</div>`;
+  }
+}
+
+function renderReviews(reviews) {
+  if (!reviews.length) return `<div class="empty-state"><div class="e-icon">📝</div>Jadilah yang pertama memberi ulasan.</div>`;
+  return reviews
+    .map(
+      (r) => `<div class="review-item">
+        <div class="r-head"><span class="r-name">${r.userName}</span><span class="r-date">${formatDate(r.date)}</span></div>
+        <div class="stars">${stars(r.rating)}</div>
+        <p style="margin:4px 0 0;font-size:0.86rem">${r.comment}</p>
+      </div>`
+    )
+    .join("");
+}
+
+function renderReviewForm() {
+  const wrap = document.getElementById("reviewForm");
+  if (!isLoggedIn()) {
+    wrap.innerHTML = `<div class="card card-pad" style="margin-bottom:14px"><a href="login.html">Masuk</a> untuk memberi ulasan.</div>`;
+    return;
+  }
+  wrap.innerHTML = `
+    <div class="card card-pad" style="margin-bottom:14px">
+      <div class="field">
+        <label>Rating kamu</label>
+        <select id="rvRating"><option value="5">★★★★★ Sangat baik</option><option value="4">★★★★ Baik</option><option value="3">★★★ Cukup</option><option value="2">★★ Kurang</option><option value="1">★ Buruk</option></select>
+      </div>
+      <div class="field"><label>Komentar</label><textarea id="rvComment" rows="2" placeholder="Bagikan pengalamanmu..."></textarea></div>
+      <button class="btn btn-outline" onclick="submitReview()">Kirim ulasan</button>
+    </div>`;
+}
+
+async function submitReview() {
+  const rating = document.getElementById("rvRating").value;
+  const comment = document.getElementById("rvComment").value.trim();
+  if (!comment) return showToast("Tulis komentar dulu ya.");
+  try {
+    await api(`/facilities/${fid}/reviews`, { method: "POST", auth: true, body: { rating, comment } });
+    showToast("Ulasan terkirim, makasih!");
+    load();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+function renderBookingForm(f) {
+  const wrap = document.getElementById("bookingSection");
+  const loginNotice = !isLoggedIn()
+    ? `<div class="card card-pad" style="background:#fbeecc;margin-bottom:12px"><strong>Perlu masuk dulu.</strong> Pendaftaran/booking mengharuskan kamu login supaya statusnya bisa dipantau. <a href="login.html">Masuk sekarang</a> atau <a href="register.html">daftar akun</a>.</div>`
+    : "";
+
+  let formHtml = "";
+  if (f.bookingType === "wisata") {
+    formHtml = `
+      <div class="field"><label>Tanggal kunjungan</label><input type="date" id="bkDate" /></div>
+      <div class="field"><label>Jumlah peserta</label><input type="number" id="bkQty" min="1" value="1" /></div>
+      ${paymentPicker(true)}
+      <button class="btn btn-primary" onclick="submitBooking()">Daftar &amp; Bayar</button>`;
+  } else if (f.bookingType === "reguler") {
+    formHtml = `
+      <div class="field"><label>Jadwal yang diinginkan</label><input id="bkDate" placeholder="mis. Sabtu sore, atau sesuai jadwal tersedia" /></div>
+      <div class="field"><label>Catatan (usia, pengalaman, dll)</label><textarea id="bkNotes" rows="2" placeholder="Ceritakan sedikit tentang dirimu"></textarea></div>
+      ${f.id === "les-karawitan" ? `<div class="field-hint" style="margin-bottom:14px">Kelas karawitan masih gratis — cukup kirim pendaftaran, admin akan menghubungimu untuk jadwal.</div>` : paymentPicker(false)}
+      <button class="btn btn-primary" onclick="submitBooking()">Kirim Pendaftaran</button>`;
+  } else if (f.bookingType === "rental") {
+    formHtml = `
+      <div class="field"><label>Tanggal sewa</label><input type="date" id="bkDate" /></div>
+      <div class="field"><label>Karakter / ukuran kostum</label><input id="bkNotes" placeholder="mis. Kostum Panji, ukuran M" /></div>
+      ${paymentPicker(true)}
+      <button class="btn btn-primary" onclick="submitBooking()">Ajukan Sewa</button>`;
+  } else if (f.bookingType === "event") {
+    formHtml = `
+      <div class="field"><label>Jenis acara</label><input id="bkEventType" placeholder="mis. Pernikahan, Festival, Study Tour" /></div>
+      <div class="field"><label>Tanggal acara</label><input type="date" id="bkDate" /></div>
+      <div class="field"><label>Lokasi acara</label><input id="bkLocation" placeholder="Alamat lengkap lokasi acara" /></div>
+      <div class="field"><label>Perkiraan jumlah tamu/peserta</label><input type="number" id="bkGuest" min="1" /></div>
+      <div class="field"><label>Catatan tambahan</label><textarea id="bkNotes" rows="2" placeholder="Durasi, lakon yang diinginkan, dll"></textarea></div>
+      <div class="field-hint" style="margin-bottom:14px">Tim kami akan meninjau permintaan ini dan menghubungimu untuk penawaran harga.</div>
+      <button class="btn btn-primary" onclick="submitBooking()">Ajukan Permintaan</button>`;
+  }
+
+  wrap.innerHTML = `
+    <div class="section" style="padding:16px 0 0">
+      <div class="section-head"><h3>${bookingHeading(f)}</h3></div>
+      ${loginNotice}
+      <div class="card card-pad" id="bookingFormCard" style="${!isLoggedIn() ? "opacity:0.5;pointer-events:none" : ""}">
+        ${formHtml}
+      </div>
+      <div id="bookingResult"></div>
+    </div>`;
+}
+
+function bookingHeading(f) {
+  return { wisata: "Daftar & bayar", reguler: "Formulir pendaftaran", rental: "Ajukan sewa", event: "Ajukan panggilan / kunjungan" }[f.bookingType] || "Daftar";
+}
+
+function paymentPicker(required) {
+  return `
+    <div class="field">
+      <label>Metode pembayaran ${required ? "" : "(opsional, bisa dikonfirmasi belakangan)"}</label>
+      <div class="pill-choice">
+        <label><input type="radio" name="bkPay" value="qris" ${required ? "checked" : ""}/><span>QRIS</span></label>
+        <label><input type="radio" name="bkPay" value="transfer" ${required ? "" : "checked"}/><span>Transfer Bank</span></label>
+        <label><input type="radio" name="bkPay" value="cash" /><span>Tunai di lokasi</span></label>
+      </div>
+    </div>`;
+}
+
+async function submitBooking() {
+  if (!requireLoginOrRedirect()) return;
+  const payEl = document.querySelector('input[name="bkPay"]:checked');
+  const body = {
+    facilityId: fid,
+    date: document.getElementById("bkDate") ? document.getElementById("bkDate").value : null,
+    notes: document.getElementById("bkNotes") ? document.getElementById("bkNotes").value : "",
+    paymentMethod: payEl ? payEl.value : null,
+    eventType: document.getElementById("bkEventType") ? document.getElementById("bkEventType").value : null,
+    location: document.getElementById("bkLocation") ? document.getElementById("bkLocation").value : null,
+    guestCount: document.getElementById("bkGuest") ? document.getElementById("bkGuest").value : null,
+  };
+  try {
+    const { booking } = await api("/bookings", { method: "POST", auth: true, body });
+    showToast("Permintaan terkirim!");
+    renderBookingResult(booking);
+    document.getElementById("bookingFormCard").style.display = "none";
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+async function renderBookingResult(booking) {
+  const resultWrap = document.getElementById("bookingResult");
+  const [label, tone] = statusLabel(booking.status);
+
+  if (booking.status === "menunggu_pembayaran" && booking.paymentMethod !== "cash") {
+    resultWrap.innerHTML = `<div class="card card-pad"><span class="status-chip ${tone}">${label}</span>
+      <p style="margin-top:10px">Scan QRIS di bawah untuk membayar, lalu unggah bukti pembayaranmu.</p>
+      <div class="qr-box" id="qrBox">Memuat QRIS...</div>
+      <div class="field" style="margin-top:12px"><label>Unggah bukti pembayaran</label><input type="file" id="proofFile" accept="image/*,.pdf" /></div>
+      <button class="btn btn-primary" onclick="uploadProof('${booking.id}')">Unggah Bukti</button>
+    </div>`;
+    try {
+      const { qris, amount } = await api(`/bookings/${booking.id}/qris`, { auth: true });
+      document.getElementById("qrBox").innerHTML = `<img src="${qris}"/><div style="font-weight:700">${formatRupiah(amount)}</div><div class="field-hint">QRIS simulasi untuk keperluan demo</div>`;
+    } catch (e) {}
+  } else if (booking.status === "menunggu_kedatangan") {
+    resultWrap.innerHTML = `<div class="card card-pad"><span class="status-chip ${tone}">${label}</span><p style="margin-top:10px">Silakan datang sesuai jadwal dan bayar langsung di lokasi. Sampai jumpa di sanggar!</p></div>`;
+  } else {
+    resultWrap.innerHTML = `<div class="card card-pad"><span class="status-chip ${tone}">${label}</span><p style="margin-top:10px">Permintaanmu sudah kami terima. Pantau statusnya di halaman <a href="my-orders.html">Pesanan Saya</a>, admin akan menghubungimu melalui email/WhatsApp.</p></div>`;
+  }
+}
+
+async function uploadProof(bookingId) {
+  const fileInput = document.getElementById("proofFile");
+  if (!fileInput.files.length) return showToast("Pilih file bukti pembayaran dulu.");
+  const fd = new FormData();
+  fd.append("proof", fileInput.files[0]);
+  try {
+    await api(`/bookings/${bookingId}/proof`, { method: "POST", auth: true, isForm: true, body: fd });
+    showToast("Bukti pembayaran diunggah, menunggu verifikasi admin.");
+    document.getElementById("bookingResult").innerHTML = `<div class="card card-pad"><span class="status-chip wait">Menunggu Verifikasi</span><p style="margin-top:10px">Terima kasih! Admin akan memverifikasi pembayaranmu dalam 1x24 jam.</p></div>`;
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+load();
+renderChrome("facilities");
+</script>
+</body>
+</html>

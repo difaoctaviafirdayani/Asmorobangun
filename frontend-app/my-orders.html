@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pesanan Saya — Asmorobangun</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="topbar-row">
+      <button class="icon-btn" onclick="location.href='index.html'">←</button>
+      <div class="wordmark" style="font-size:1.05rem">Pesanan Saya</div>
+    </div>
+  </div>
+  <div class="section" style="display:flex;gap:8px">
+    <button class="tag" id="tabBooking" style="background:var(--wood-800);color:#fff;border:none" onclick="showTab('booking')">Pendaftaran/Booking</button>
+    <button class="tag" id="tabTopeng" style="background:var(--cream-300);color:var(--wood-900);border:none" onclick="showTab('topeng')">Pesanan Topeng</button>
+  </div>
+  <div class="section" id="listWrap">Memuat...</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+if (!requireLoginOrRedirect()) {}
+let tab = "booking";
+function showTab(t) {
+  tab = t;
+  document.getElementById("tabBooking").style.background = t === "booking" ? "var(--wood-800)" : "var(--cream-300)";
+  document.getElementById("tabBooking").style.color = t === "booking" ? "#fff" : "var(--wood-900)";
+  document.getElementById("tabTopeng").style.background = t === "topeng" ? "var(--wood-800)" : "var(--cream-300)";
+  document.getElementById("tabTopeng").style.color = t === "topeng" ? "#fff" : "var(--wood-900)";
+  load();
+}
+async function load() {
+  const wrap = document.getElementById("listWrap");
+  if (tab === "booking") {
+    const { bookings } = await api("/bookings/mine", { auth: true });
+    wrap.innerHTML = bookings.length
+      ? bookings.map((b) => {
+          const [label, tone] = statusLabel(b.status);
+          return `<div class="card card-pad" style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between"><strong style="font-size:0.9rem">${b.facilityName}</strong><span class="status-chip ${tone}">${label}</span></div>
+            <div class="field-hint">${b.date ? formatDate(b.date) : ""} ${b.location ? "· " + b.location : ""}</div>
+            ${b.amount ? `<div style="font-size:0.85rem;margin-top:4px">${formatRupiah(b.amount)} · ${b.paymentMethod || "-"}</div>` : ""}
+            <a href="facility-detail.html?id=${b.facilityId}" style="font-size:0.78rem;color:var(--wood-700);font-weight:700">Lihat fasilitas →</a>
+          </div>`;
+        }).join("")
+      : `<div class="empty-state"><div class="e-icon">🗂️</div>Belum ada pendaftaran/booking.</div>`;
+  } else {
+    const { orders } = await api("/topeng/orders/mine", { auth: true });
+    wrap.innerHTML = orders.length
+      ? orders.map((o) => {
+          const [label, tone] = statusLabel(o.status);
+          return `<a class="card card-pad" style="display:block;margin-bottom:10px" href="order-chat.html?id=${o.id}">
+            <div style="display:flex;justify-content:space-between"><strong style="font-size:0.9rem">${o.topengName} x${o.qty}</strong><span class="status-chip ${tone}">${label}</span></div>
+            <div class="field-hint">${formatRupiah(o.total)} · ${formatDate(o.createdAt)}</div>
+          </a>`;
+        }).join("")
+      : `<div class="empty-state"><div class="e-icon">🪆</div>Belum ada pesanan topeng.</div>`;
+  }
+}
+load();
+renderChrome("profile");
+</script>
+</body>
+</html>

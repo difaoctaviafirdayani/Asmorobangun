@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kelola Artikel &amp; Berita — Admin Asmorobangun</title>
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<div class="admin-shell">
+  <main class="main">
+    <div class="page-head">
+      <div><h1>Kelola Artikel &amp; Berita</h1><p>Tulis berita terbaru sanggar — akan langsung tayang di halaman Artikel pengguna.</p></div>
+      <button class="btn btn-primary" onclick="openNew()">+ Tulis Artikel</button>
+    </div>
+    <div class="card-list" id="list">Memuat...</div>
+  </main>
+</div>
+
+<div class="modal-bg" id="editModal">
+  <div class="modal" style="width:600px">
+    <h3>Tulis Artikel/Berita Baru</h3>
+    <div class="grid-2">
+      <div class="field"><label>Judul</label><input id="fTitle" /></div>
+      <div class="field"><label>Kategori</label><input id="fCategory" placeholder="mis. Berita, Acara, Budaya" /></div>
+    </div>
+    <div class="field"><label>Nama file gambar / URL gambar</label><input id="fImage" placeholder="artikel-x.jpg atau https://..." /></div>
+    <div class="field"><label>Ringkasan singkat</label><textarea id="fExcerpt" rows="2"></textarea></div>
+    <div class="field"><label>Isi lengkap (pisahkan paragraf dengan baris kosong)</label><textarea id="fContent" rows="6"></textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="closeModal()">Batal</button>
+      <button class="btn btn-primary" onclick="save()">Terbitkan</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+async function load() {
+  const { articles } = await api("/articles");
+  document.getElementById("list").innerHTML = articles.map((a) => `
+    <div class="thumb-list-item">
+      <div style="flex:1">
+        <strong>${a.title}</strong> <span style="color:var(--ink-soft);font-size:0.78rem">· ${a.category}</span>
+        ${a.featured ? '<span class="status-chip ok" style="margin-left:6px">Sorotan Utama</span>' : ""}
+        <p style="margin:4px 0;font-size:0.85rem;color:var(--ink-soft)">${a.excerpt}</p>
+        <div style="font-size:0.75rem;color:var(--ink-soft)">${a.author} · ${formatDate(a.date)}</div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="del('${a.id}')">Hapus</button>
+    </div>
+  `).join("") || `<div class="empty-state">Belum ada artikel.</div>`;
+}
+function openNew() {
+  ["fTitle","fCategory","fImage","fExcerpt","fContent"].forEach((id) => document.getElementById(id).value = "");
+  document.getElementById("editModal").classList.add("open");
+}
+function closeModal() { document.getElementById("editModal").classList.remove("open"); }
+async function save() {
+  const body = {
+    title: document.getElementById("fTitle").value,
+    category: document.getElementById("fCategory").value || "Berita",
+    image: document.getElementById("fImage").value,
+    excerpt: document.getElementById("fExcerpt").value,
+    content: document.getElementById("fContent").value,
+  };
+  if (!body.title || !body.content) return showToast("Judul dan isi wajib diisi.");
+  try { await api("/articles", { method: "POST", body }); showToast("Artikel diterbitkan."); closeModal(); load(); }
+  catch (err) { showToast(err.message); }
+}
+async function del(id) {
+  if (!confirm("Hapus artikel ini?")) return;
+  try { await api(`/articles/${id}`, { method: "DELETE" }); showToast("Dihapus."); load(); }
+  catch (err) { showToast(err.message); }
+}
+load();
+renderSidebar("artikel");
+</script>
+</body>
+</html>

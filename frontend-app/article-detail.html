@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Artikel — Asmorobangun</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="app-shell">
+  <div class="back-row">
+    <button class="back-btn" onclick="location.href='articles.html'">←</button>
+  </div>
+  <div id="content" class="section">Memuat...</div>
+</div>
+<script src="js/api.js"></script>
+<script src="js/nav.js"></script>
+<script>
+async function load() {
+  const slug = new URLSearchParams(location.search).get("slug");
+  try {
+    const { article: a } = await api(`/articles/${slug}`);
+    document.title = a.title + " — Asmorobangun";
+    document.getElementById("content").innerHTML = `
+      <img class="detail-hero" style="border-radius:16px" src="assets/${a.image}" onerror="this.src='https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=700'"/>
+      <div style="margin-top:14px">
+        <span class="tag">${a.category}</span>
+        <h2 style="margin-top:10px">${a.title}</h2>
+        <div style="font-size:0.78rem;color:var(--ink-soft);margin-bottom:14px">Oleh ${a.author} · ${formatDate(a.date)}</div>
+        ${a.content.split("\n\n").map((p) => `<p>${p}</p>`).join("")}
+      </div>`;
+  } catch (err) {
+    document.getElementById("content").innerHTML = `<div class="empty-state">Artikel tidak ditemukan.</div>`;
+  }
+}
+load();
+renderChrome("");
+</script>
+</body>
+</html>
