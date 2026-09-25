@@ -32,12 +32,12 @@
 <script src="js/api.js"></script>
 <script src="js/nav.js"></script>
 <script>
-const ICONS = { "panggilan-tari": "🎪", "kunjungan-edukasi": "🏫", "les-tari-wisata": "🎫", "les-tari-reguler": "💃", "les-karawitan": "🥁", "sewa-kostum": "👘" };
+const ICONS = { "panggilan-tari": "", "kunjungan-edukasi": "⭐", "les-tari-wisata": "⭐", "les-tari-reguler": "⭐", "les-karawitan": "⭐", "sewa-kostum": "⭐" };
 async function load() {
   const { facilities } = await api("/facilities");
   document.getElementById("list").innerHTML = facilities.map((f) => `
     <div class="thumb-list-item">
-      <div style="font-size:2rem;width:64px;text-align:center">${ICONS[f.id] || "🎭"}</div>
+      <div style="font-size:2rem;width:64px;text-align:center">${ICONS[f.id] || "⭐"}</div>
       <div style="flex:1">
         <strong>${f.name}</strong> <span style="color:var(--ink-soft);font-size:0.78rem">· ${f.category}</span>
         <p style="margin:4px 0;font-size:0.85rem;color:var(--ink-soft)">${f.shortDesc}</p>
