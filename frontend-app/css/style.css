@@ -11,24 +11,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --wood-950: #2f4a37;
-  --wood-900: #3d6b48;
-  --wood-800: #4c8a57;
-  --wood-700: #5fa26a;
-  --gold-400: #d9a441;
-  --olive-600: #4c8a57;
-  --cream-100: #fffdf8;
-  --cream-200: #fbf3e2;
-  --canvas: #fbf6ea;
-  --ink: #3a2e20;
-  --ink-soft: #8a7660;
-  --line: #e8dcb9;
+  --wood-950: #2c1c12;
+  --wood-900: #3d2717;
+  --wood-800: #55341e;
+  --wood-700: #6e4527;
+  --gold-400: #c9974f;
+  --olive-600: #59684a;
+  --cream-100: #faf6ee;
+  --cream-200: #f3ecdd;
+  --canvas: #f5f1e8;
+  --ink: #29200f;
+  --ink-soft: #6b5c46;
+  --line: #e6dcc6;
   --danger: #ac3b3b;
   --ok: #3f7d4a;
   --wait: #b5822a;
   --sidebar-w: 232px;
   --radius-m: 14px;
-  --shadow-card: 0 1px 6px rgba(58,46,32,0.07);
+  --shadow-card: 0 1px 6px rgba(44,28,18,0.07);
 }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: 'Public Sans', system-ui, sans-serif; background: var(--canvas); color: var(--ink); }
