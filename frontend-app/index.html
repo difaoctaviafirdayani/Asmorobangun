@@ -12,12 +12,19 @@
   <div class="topbar">
     <div class="topbar-row">
       <div class="wordmark">asmorobangun</div>
-      <button class="icon-btn" onclick="openSearch()">🔍</button>
-      <a class="icon-btn" href="my-orders.html">🧾</a>
+      <a class="icon-btn" href="my-orders.html" style="margin-left:auto">🧾</a>
     </div>
     <div class="search-bar" onclick="openSearch()">
       <span>🔍</span>
       <input readonly placeholder="Cari artikel, kelas, topeng, forum..." />
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:14px;padding-bottom:4px">
+    <div class="card" style="overflow:hidden">
+      <img src="assets/sanggar-utama.jpg"
+           onerror="this.style.display='none'"
+           style="width:100%;height:160px;object-fit:cover;display:block" />
     </div>
   </div>
 
@@ -38,9 +45,9 @@
     <div class="section-head"><h3>Galeri sanggar</h3></div>
   </div>
   <div class="hcards" id="galleryRow">
-    <div class="hcard card"><img class="thumb" src="assets/gallery-1.jpg" onerror="this.src='https://images.unsplash.com/photo-1583225214464-9296029427aa?w=500'"/></div>
-    <div class="hcard card"><img class="thumb" src="assets/gallery-2.jpg" onerror="this.src='https://images.unsplash.com/photo-1601924582970-9238bcb495d9?w=500'"/></div>
-    <div class="hcard card"><img class="thumb" src="assets/gallery-3.jpg" onerror="this.src='https://images.unsplash.com/photo-1601921804430-e2b7a72d5b28?w=500'"/></div>
+    <div class="hcard card"><img class="thumb" src="assets/gallery-1.jpg" onerror="this.style.display='none'"/></div>
+    <div class="hcard card"><img class="thumb" src="assets/gallery-2.jpg" onerror="this.style.display='none'"/></div>
+    <div class="hcard card"><img class="thumb" src="assets/gallery-3.jpg" onerror="this.style.display='none'"/></div>
   </div>
 
   <div class="section" id="lokasi">
@@ -91,7 +98,7 @@ async function loadHome() {
       const a = data.featured;
       document.getElementById("featuredArticle").innerHTML = `
         <a class="card" href="article-detail.html?slug=${a.slug}" style="display:block">
-          <img class="thumb" style="height:150px" src="assets/${a.image}" onerror="this.src='https://images.unsplash.com/photo-1596496181848-3091d4878b24?w=600'"/>
+          <img class="thumb" style="height:150px" src="assets/${a.image}" onerror="this.style.display='none'"/>
           <div class="card-pad">
             <span class="tag">${a.category}</span>
             <h4 style="margin-top:8px">${a.title}</h4>
