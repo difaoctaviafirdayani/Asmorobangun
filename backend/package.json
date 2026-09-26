@@ -1,6 +1,6 @@
 {
   "name": "asmorobangun-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Backend API for Sanggar Asmorobangun website (Express + JSON file storage)",
   "main": "server.js",
   "type": "commonjs",
@@ -9,6 +9,7 @@
     "dev": "node server.js"
   },
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

@@ -10,6 +10,16 @@ const uploadProof = makeUploader("payment_proof");
 
 const VALID_PAYMENT_METHODS = ["qris", "transfer", "cash"];
 
+function requirePhoneVerified(req, res) {
+  const db = readDB();
+  const user = db.users.find((u) => u.id === req.user.id);
+  if (!user || !user.phoneVerified) {
+    res.status(403).json({ error: "Verifikasi nomor HP dulu sebelum melihat detail pembayaran ini.", needsPhoneVerification: true });
+    return false;
+  }
+  return true;
+}
+
 // POST /api/bookings  -- create a booking / event request (requires login, per revision #1)
 router.post("/", requireAuth, async (req, res) => {
   const { facilityId, date, notes, paymentMethod, eventType, location, guestCount, amount } = req.body;
@@ -52,13 +62,14 @@ router.post("/", requireAuth, async (req, res) => {
 
 // GET /api/bookings/:id/qris -> returns a QRIS-style QR code (PNG data URL) for a booking
 router.get("/:id/qris", requireAuth, async (req, res) => {
+  if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
   const booking = db.bookings.find((b) => b.id === req.params.id);
   if (!booking) return res.status(404).json({ error: "Booking tidak ditemukan." });
   if (booking.userId !== req.user.id && req.user.role !== "admin") {
     return res.status(403).json({ error: "Tidak diizinkan." });
   }
-  const payload = `ASMOROBANGUN|BOOKING:${booking.id}|NOMINAL:${booking.amount || 0}|SANGGAR ASMOROBANGUN PAKISAJI`;
+  const payload = `ASMOROBANGUN|BOOKING:${booking.id}|NOMINAL:${booking.amount || 0}|${db.paymentSettings.qrisMerchantName}`;
   try {
     const dataUrl = await QRCode.toDataURL(payload, { margin: 1, width: 320 });
     res.json({ qris: dataUrl, amount: booking.amount, note: "QRIS simulasi untuk keperluan demo/prototipe." });
@@ -67,7 +78,19 @@ router.get("/:id/qris", requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/bookings/:id/proof -- upload bukti transfer/qris (multipart field: proof)
+// GET /api/bookings/:id/transfer -> bank account details, only after phone verification
+router.get("/:id/transfer", requireAuth, (req, res) => {
+  if (!requirePhoneVerified(req, res)) return;
+  const db = readDB();
+  const booking = db.bookings.find((b) => b.id === req.params.id);
+  if (!booking) return res.status(404).json({ error: "Booking tidak ditemukan." });
+  if (booking.userId !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ error: "Tidak diizinkan." });
+  }
+  res.json({ bank: db.paymentSettings, amount: booking.amount });
+});
+
+// POST /api/bookings/:id/proof -- upload bukti transfer/qris/tunai (multipart field: proof)
 router.post("/:id/proof", requireAuth, uploadProof.single("proof"), async (req, res) => {
   const db = readDB();
   const booking = db.bookings.find((b) => b.id === req.params.id);
@@ -76,9 +99,11 @@ router.post("/:id/proof", requireAuth, uploadProof.single("proof"), async (req, 
   if (!req.file) return res.status(400).json({ error: "File bukti pembayaran wajib diunggah." });
 
   const fileUrl = `/uploads/payment_proof/${req.file.filename}`;
+  const { paymentMethod } = req.body;
   await update((data) => {
     const b = data.bookings.find((x) => x.id === req.params.id);
     b.proofFile = fileUrl;
+    if (paymentMethod) b.paymentMethod = paymentMethod;
     b.status = "menunggu_verifikasi";
   });
   res.json({ message: "Bukti pembayaran berhasil diunggah, menunggu verifikasi admin.", proofFile: fileUrl });

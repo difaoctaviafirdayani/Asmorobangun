@@ -1,0 +1,54 @@
+import { api, setSession, showToast } from "../api.js";
+
+async function render(container) {
+  container.innerHTML = `
+    <div class="auth-hero">
+      <div class="wordmark">asmorobangun</div>
+      <div class="tagline">Sanggar Wayang Topeng Malangan · Pakisaji</div>
+    </div>
+    <div class="auth-body">
+      <h2>Daftar Akun</h2>
+      <p style="color:var(--ink-soft);font-size:0.88rem">Buat akun untuk bisa mendaftar kelas, memesan topeng, dan booking pentas.</p>
+      <form id="registerForm">
+        <div class="field">
+          <label>Nama lengkap</label>
+          <input id="name" required placeholder="Nama kamu" />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="email" required placeholder="nama@email.com" />
+        </div>
+        <div class="field">
+          <label>No. HP / WhatsApp</label>
+          <input id="phone" placeholder="08xxxxxxxxxx" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" required minlength="6" placeholder="Minimal 6 karakter" />
+        </div>
+        <button class="btn btn-primary" type="submit">Daftar</button>
+      </form>
+      <p class="auth-switch">Sudah punya akun? <a href="#/login">Masuk di sini</a></p>
+    </div>
+  `;
+
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const password = document.getElementById("password").value;
+    try {
+      const data = await api("/auth/register", { method: "POST", body: { name, email, phone, password } });
+      setSession(data.token, data.user);
+      showToast("Akun berhasil dibuat!");
+      const redirect = localStorage.getItem("asmoro_redirect_after_login");
+      localStorage.removeItem("asmoro_redirect_after_login");
+      location.hash = redirect || "#/";
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+}
+
+export default { nav: "profile", render };

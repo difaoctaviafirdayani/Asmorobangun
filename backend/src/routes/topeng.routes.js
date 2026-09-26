@@ -8,6 +8,16 @@ const { makeUploader } = require("../upload");
 const router = express.Router();
 const uploadProof = makeUploader("payment_proof");
 
+function requirePhoneVerified(req, res) {
+  const db = readDB();
+  const user = db.users.find((u) => u.id === req.user.id);
+  if (!user || !user.phoneVerified) {
+    res.status(403).json({ error: "Verifikasi nomor HP dulu sebelum melihat detail pembayaran ini.", needsPhoneVerification: true });
+    return false;
+  }
+  return true;
+}
+
 router.get("/", (req, res) => {
   const db = readDB();
   res.json({ topeng: db.topeng });
@@ -32,6 +42,7 @@ router.post("/:id/order", requireAuth, async (req, res) => {
     id: `ord-${nanoid(8)}`,
     topengId: item.id,
     topengName: item.name,
+    topengImage: item.image,
     userId: req.user.id,
     userName: req.user.name,
     buyerPhone: buyerPhone || "",
@@ -73,17 +84,28 @@ router.post("/orders/:orderId/message", requireAuth, async (req, res) => {
 });
 
 router.get("/orders/:orderId/qris", requireAuth, async (req, res) => {
+  if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
   const order = db.topengOrders.find((o) => o.id === req.params.orderId);
   if (!order) return res.status(404).json({ error: "Pesanan tidak ditemukan." });
   if (order.userId !== req.user.id && req.user.role !== "admin") return res.status(403).json({ error: "Tidak diizinkan." });
-  const payload = `ASMOROBANGUN|ORDER:${order.id}|NOMINAL:${order.total}|SANGGAR ASMOROBANGUN PAKISAJI`;
+  const payload = `ASMOROBANGUN|ORDER:${order.id}|NOMINAL:${order.total}|${db.paymentSettings.qrisMerchantName}`;
   try {
     const dataUrl = await QRCode.toDataURL(payload, { margin: 1, width: 320 });
     res.json({ qris: dataUrl, amount: order.total, note: "QRIS simulasi untuk keperluan demo/prototipe." });
   } catch (err) {
     res.status(500).json({ error: "Gagal membuat QRIS." });
   }
+});
+
+// GET /api/topeng/orders/:orderId/transfer -- bank account details, only after phone verification
+router.get("/orders/:orderId/transfer", requireAuth, (req, res) => {
+  if (!requirePhoneVerified(req, res)) return;
+  const db = readDB();
+  const order = db.topengOrders.find((o) => o.id === req.params.orderId);
+  if (!order) return res.status(404).json({ error: "Pesanan tidak ditemukan." });
+  if (order.userId !== req.user.id && req.user.role !== "admin") return res.status(403).json({ error: "Tidak diizinkan." });
+  res.json({ bank: db.paymentSettings, amount: order.total });
 });
 
 router.post("/orders/:orderId/proof", requireAuth, uploadProof.single("proof"), async (req, res) => {
@@ -93,9 +115,11 @@ router.post("/orders/:orderId/proof", requireAuth, uploadProof.single("proof"), 
   if (order.userId !== req.user.id) return res.status(403).json({ error: "Tidak diizinkan." });
   if (!req.file) return res.status(400).json({ error: "File bukti pembayaran wajib diunggah." });
   const fileUrl = `/uploads/payment_proof/${req.file.filename}`;
+  const { paymentMethod } = req.body;
   await update((data) => {
     const o = data.topengOrders.find((x) => x.id === req.params.orderId);
     o.proofFile = fileUrl;
+    if (paymentMethod) o.paymentMethod = paymentMethod;
     o.status = "menunggu_verifikasi";
   });
   res.json({ message: "Bukti pembayaran diunggah.", proofFile: fileUrl });

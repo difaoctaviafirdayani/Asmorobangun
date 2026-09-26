@@ -15,6 +15,8 @@ const aiRoutes = require("./src/routes/ai.routes");
 const galleryRoutes = require("./src/routes/gallery.routes");
 const cultureRoutes = require("./src/routes/culture.routes");
 const adminRoutes = require("./src/routes/admin.routes");
+const uploadsRoutes = require("./src/routes/uploads.routes");
+const paymentsRoutes = require("./src/routes/payments.routes");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -23,12 +25,13 @@ app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files (payment proofs, etc.)
+// Serve uploaded files (payment proofs, site images from the admin media library, etc.)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// This server is a pure JSON API. There are two separate static frontends:
-//   frontend-app/   -> user-facing app (mobile-first)
-//   frontend-admin/ -> admin dashboard (desktop web)
+// This server is a pure JSON API. There are two separate single-page
+// frontends (no multi-page HTML — everything renders through JS):
+//   frontend-app/   -> user-facing app (mobile-first, responsive up to desktop)
+//   frontend-admin/ -> admin dashboard (responsive: phone/tablet/laptop)
 // Serve them too, each on its own path, so the whole project still runs
 // with a single `npm start` if you don't want to run separate static servers.
 app.use("/app", express.static(path.join(__dirname, "..", "frontend-app")));
@@ -46,6 +49,8 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/culture", cultureRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/uploads", uploadsRoutes);
+app.use("/api/payments", paymentsRoutes);
 
 app.get("/api/health", (req, res) => res.json({ ok: true, name: "Asmorobangun API" }));
 

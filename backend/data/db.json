@@ -7,7 +7,9 @@
       "password": "$2a$10$U1Q1AHxcLUjcHtwBBkYy4.vR9vRe6MRsNiGB95yez9Zqj6A9XXbA2",
       "role": "admin",
       "phone": "081234567890",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phoneVerified": false,
+      "verifiedPhone": null
     },
     {
       "id": "u-1jjZufHd",
@@ -16,7 +18,9 @@
       "phone": "082231313237",
       "password": "$2a$10$hPmexM9Bl5Tl5HV.zEfzu.lN8Zs0Zm0wus.rfsAI4vGRkFIiFK.Lm",
       "role": "member",
-      "createdAt": "2026-09-25T06:28:23.657Z"
+      "createdAt": "2026-09-25T06:28:23.657Z",
+      "phoneVerified": false,
+      "verifiedPhone": null
     }
   ],
   "facilities": [
@@ -131,8 +135,8 @@
       "name": "Topeng Panji",
       "character": "Tokoh utama, watak lembut & bijaksana",
       "color": "Putih",
-      "price": 350000,
-      "stock": 5,
+      "price": "350000",
+      "stock": "5",
       "image": "topeng-panji.jpg",
       "desc": "Topeng Panji melambangkan sosok ksatria yang tenang, bijaksana, dan berbudi luhur. Cocok untuk koleksi maupun properti pentas."
     },
@@ -356,5 +360,13 @@
       "date": "2026-09-25T06:31:27.043Z",
       "replies": []
     }
-  ]
+  ],
+  "paymentSettings": {
+    "bankName": "Bank Rakyat Indonesia (BRI)",
+    "accountNumber": "0192-01-000123-50-7",
+    "accountName": "Sanggar Asmorobangun (Tri Handoyo)",
+    "qrisMerchantName": "SANGGAR ASMOROBANGUN",
+    "whatsapp": "6281234567890"
+  },
+  "mediaLibrary": []
 }

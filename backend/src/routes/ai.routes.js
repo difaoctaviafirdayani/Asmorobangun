@@ -3,57 +3,76 @@ const { readDB } = require("../db");
 
 const router = express.Router();
 
-const SYSTEM_CONTEXT = `Kamu adalah "Asisten Asmorobangun", asisten virtual di website Sanggar Asmorobangun
-(Wayang Topeng Malangan) di Dusun Kedungmonggo, Desa Karangpandan, Kec. Pakisaji, Kab. Malang.
-Jawab singkat, ramah, dan dalam Bahasa Indonesia. Bantu pengunjung soal: jadwal & cara daftar kelas
-tari/karawitan, kelas tari wisata (Rp 15.000/sekali datang), sewa kostum, panggilan tari untuk acara,
-kunjungan edukasi, cara pesan topeng, metode pembayaran (QRIS, transfer, tunai), dan info budaya
-Topeng Malangan. Jika tidak yakin, arahkan pengguna untuk bertanya di forum diskusi atau menghubungi
-admin sanggar.`;
+// This assistant is intentionally scoped to ONE topic only: Topeng Malangan
+// (the carved masks) — their history, characters/watak, materials, carving
+// process, colors & symbolism, care/maintenance, collecting, and the
+// sanggar's own catalog & custom-order process. It is deliberately NOT used
+// for booking classes, forum questions, articles, etc. — those are handled
+// elsewhere on the site. Within the topeng topic itself, it answers freely.
+const SYSTEM_CONTEXT = `Kamu adalah "Asisten Topeng", asisten virtual yang HANYA membahas Topeng Malangan
+(topeng kayu khas Malang) di toko topeng milik Sanggar Asmorobangun, Dusun Kedungmonggo, Pakisaji, Malang.
+
+Kamu boleh menjawab APAPUN yang berkaitan dengan topeng secara bebas dan mendalam, tanpa dibatasi, termasuk:
+- Sejarah & filosofi Wayang Topeng Malangan
+- Tokoh/karakter topeng (Panji, Klana, Bapang, Dewi Sekartaji, dsb), watak, dan makna warna/ekspresi wajahnya
+- Bahan baku (jenis kayu seperti kayu waru/mentaos/sengon), proses pengukiran, pewarnaan, dan finishing
+- Cara merawat topeng koleksi (dari kelembapan, rayap, retak, dsb) serta cara membersihkannya
+- Perbedaan gaya topeng antar daerah/sanggar
+- Produk yang dijual sanggar ini: nama, harga, watak, dan stok (lihat data katalog di bawah)
+- Proses pemesanan, termasuk request nama/desain custom pada topeng
+
+Jika pengguna bertanya di luar topik topeng (misalnya soal jadwal kelas tari, karawitan, booking pentas,
+forum, atau hal umum lain), jawab singkat bahwa asisten ini khusus membahas topeng saja, dan arahkan mereka
+ke menu terkait di aplikasi (Fasilitas, Forum, dsb). Selalu jawab dalam Bahasa Indonesia, hangat, dan jelas.`;
+
+function catalogSummary(db) {
+  return db.topeng
+    .map((t) => `- ${t.name} (${t.character}, warna ${t.color}): Rp ${Number(t.price).toLocaleString("id-ID")}, stok ${t.stock}`)
+    .join("\n");
+}
+
+const OFF_TOPIC = /(kelas tari|karawitan|jadwal kelas|sewa kostum|panggilan tari|kunjungan edukasi|booking|daftar kelas|forum diskusi|login|register|artikel|berita sanggar)/i;
 
 // Rule-based fallback so the assistant still works with zero configuration / no API key.
 function ruleBasedAnswer(message) {
   const m = message.toLowerCase();
   const db = readDB();
 
+  if (OFF_TOPIC.test(m)) {
+    return "Asisten ini khusus membahas Topeng Malangan ya 🎭 — untuk kelas tari, karawitan, sewa kostum, atau booking pentas, silakan cek menu Fasilitas atau Forum Diskusi di aplikasi.";
+  }
   if (/(halo|hai|hi|pagi|siang|sore|malam)/.test(m) && m.length < 20) {
-    return "Halo! Selamat datang di Sanggar Asmorobangun. Ada yang bisa dibantu seputar kelas tari, karawitan, sewa kostum, topeng, atau panggilan pentas?";
+    return "Halo! Aku Asisten Topeng 🎭 — siap bantu jawab apapun soal Topeng Malangan: sejarah, tokoh, bahan, cara merawat, sampai katalog topeng yang dijual di sini. Mau tanya apa?";
   }
-  if (/(lokasi|alamat|dimana|di mana|rute|arah)/.test(m)) {
-    return "Sanggar kami berada di Dusun Kedungmonggo, Desa Karangpandan, Kecamatan Pakisaji, Kabupaten Malang — sekitar 30-40 menit berkendara dari Alun-Alun Kota Malang. Cek menu 'Lokasi' di halaman utama untuk peta lengkap.";
+  if (/(beli|pesan|order|harga|katalog).*(topeng)?/.test(m) || /topeng.*(beli|pesan|harga)/.test(m)) {
+    return `Katalog topeng yang tersedia saat ini:\n${catalogSummary(db)}\n\nKamu juga bisa request nama/desain custom saat memesan lewat tombol "Pesan" di halaman ini.`;
   }
-  if (/(harga|biaya|bayar|tarif).*(tari|wisata|kelas)/.test(m) || /kelas.*(harga|biaya)/.test(m)) {
-    return "Kelas Tari Wisata (sekali datang) Rp 15.000/sesi. Untuk Les Tari Reguler (menetap) biaya SPP menyesuaikan kelompok usia, silakan hubungi admin lewat halaman fasilitas untuk rincian.";
+  if (/(rawat|simpan|jamur|rayap|retak|bersih)/.test(m)) {
+    return "Simpan topeng di tempat kering dan sejuk, hindari sinar matahari langsung supaya warnanya tidak pudar. Lap berkala dengan kain kering/lembut, dan beri kapur barus di lemari penyimpanan untuk mencegah rayap. Kalau ada retak kecil, sebaiknya dibawa ke pengrajin untuk direstorasi, jangan diberi lem sembarangan.";
   }
-  if (/karawitan/.test(m)) {
-    return "Kelas Karawitan masih gratis untuk saat ini! Kamu akan belajar langsung dari nayaga sanggar mulai dari mengenal instrumen gamelan sampai mengiringi pentas. Daftar lewat halaman Fasilitas > Les Karawitan.";
+  if (/(bahan|kayu|ukir|proses|buat)/.test(m)) {
+    return "Topeng Malangan umumnya diukir dari kayu waru, mentaos, atau sengon yang cukup lunak untuk diukir detail tapi cukup awet. Prosesnya: kayu dibentuk kasar → diukir detail wajah → dihaluskan → dilapisi dempul kayu tipis → dicat & di-finishing sesuai warna karakter tokohnya.";
   }
-  if (/(sewa|rental).*(kostum|baju)/.test(m)) {
-    return "Sewa kostum mulai Rp 75.000/set/hari tergantung karakter & kelengkapan. Disarankan pesan minimal H-3 sebelum tanggal pemakaian ya.";
+  if (/(panji)/.test(m)) {
+    return "Topeng Panji melambangkan ksatria yang tenang, bijaksana, dan berbudi luhur — biasanya berwarna putih/dasar polos dengan ekspresi wajah halus dan mata sipit, mewakili kesempurnaan batin.";
   }
-  if (/(panggil|undang|manggung|pentas|acara|nikah|hajatan)/.test(m)) {
-    return "Untuk panggilan pentas (pernikahan, festival, acara instansi, dll), silakan isi form 'Panggilan Tari' di halaman Fasilitas. Tim kami akan meninjau lalu memberi penawaran sesuai jumlah penari & lokasi.";
+  if (/(klana)/.test(m)) {
+    return "Topeng Klana biasanya menggambarkan tokoh antagonis yang berwatak keras, penuh amarah, dan berambisi — warnanya merah menyala dengan mata melotot dan kumis tebal.";
   }
-  if (/(beli|pesan|order).*(topeng)/.test(m) || /topeng.*(beli|pesan|harga)/.test(m)) {
-    const names = db.topeng.map((t) => t.name).join(", ");
-    return `Kami punya beberapa topeng siap jual: ${names}. Kamu juga bisa request nama/desain custom saat memesan lewat halaman Topeng, lalu lanjut chat dengan admin di sana.`;
+  if (/(warna|makna warna)/.test(m)) {
+    return "Warna pada topeng Malangan punya makna watak: putih/krem untuk tokoh halus & bijaksana, merah untuk watak keras/berani/pemarah, hitam untuk watak berwibawa/tegas, dan emas/kuning untuk tokoh bangsawan.";
   }
-  if (/(bayar|pembayaran|qris|transfer|tunai|cash)/.test(m)) {
-    return "Pembayaran non-tunai bisa lewat QRIS (kode QR muncul otomatis) atau transfer bank — setelah itu unggah bukti bayar di halaman booking kamu. Bayar tunai juga bisa langsung di lokasi.";
+  if (/(custom|desain sendiri|request nama)/.test(m)) {
+    return "Bisa banget! Saat memesan, centang opsi 'request nama/desain custom', lalu jelaskan warna, karakter, atau detail ukiran yang kamu inginkan. Admin sanggar akan lanjut diskusi detailnya lewat chat pesanan.";
   }
-  if (/(daftar|register|masuk|login)/.test(m)) {
-    return "Untuk mendaftar kelas, memesan topeng, atau membuat permintaan panggilan pentas, kamu perlu login/daftar akun dulu ya — supaya pesananmu tersimpan dan bisa dipantau statusnya.";
-  }
-  if (/(sejarah|asal|berdiri)/.test(m)) {
-    return "Sanggar Asmorobangun dirintis sejak akhir 1970-an oleh maestro topeng Mbah Karimun, kini diteruskan cucunya, Tri Handoyo. Baca selengkapnya di halaman Artikel kami!";
-  }
-  return "Terima kasih sudah bertanya! Untuk pertanyaan ini, coba cek halaman Forum Diskusi atau Fasilitas — kalau masih belum ketemu jawabannya, silakan hubungi admin sanggar langsung ya.";
+  return "Aku bisa bantu jawab apapun soal Topeng Malangan — sejarah, tokoh & wataknya, bahan & proses pembuatan, cara merawat, sampai katalog yang dijual di sini. Coba tanya lebih spesifik ya!";
 }
 
 router.post("/chat", async (req, res) => {
   const { message, history } = req.body;
   if (!message) return res.status(400).json({ error: "Pesan tidak boleh kosong." });
 
+  const db = readDB();
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return res.json({ reply: ruleBasedAnswer(message), mode: "rule-based" });
@@ -70,8 +89,8 @@ router.post("/chat", async (req, res) => {
       },
       body: JSON.stringify({
         model: "claude-sonnet-5",
-        max_tokens: 400,
-        system: SYSTEM_CONTEXT,
+        max_tokens: 500,
+        system: `${SYSTEM_CONTEXT}\n\nData katalog topeng saat ini:\n${catalogSummary(db)}`,
         messages,
       }),
     });

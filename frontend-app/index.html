@@ -3,134 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Asmorobangun — Beranda</title>
+<title>Asmorobangun — Sanggar Wayang Topeng Malangan</title>
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div class="app-shell">
-
-  <div class="topbar">
-    <div class="topbar-row">
-      <div class="wordmark">asmorobangun</div>
-      <a class="icon-btn" href="my-orders.html" style="margin-left:auto">🧾</a>
-    </div>
-    <div class="search-bar" onclick="openSearch()">
-      <span></span>
-      <input readonly placeholder="Cari artikel, kelas, topeng, forum..." />
-    </div>
-  </div>
-
-  <div class="section" style="padding-top:14px;padding-bottom:4px">
-    <div class="card" style="overflow:hidden">
-      <img src="assets/sanggar-utama.jpg"
-           onerror="this.style.display='none'"
-           style="width:100%;height:160px;object-fit:cover;display:block" />
-    </div>
-  </div>
-
-  <!-- "Status" row = pengumuman terbaru, tap to open like a WhatsApp status -->
-  <div class="status-row" id="statusRow"></div>
-
-  <div class="section" style="padding-top:6px">
-    <div class="section-head"><h3>Berita &amp; artikel terbaru</h3><a class="see-all" href="articles.html">Lihat semua</a></div>
-    <div id="featuredArticle"></div>
-  </div>
-
-  <div class="section">
-    <div class="section-head"><h3>Layanan sanggar</h3><a class="see-all" href="facilities.html">Lihat semua</a></div>
-  </div>
-  <div class="menu-list" id="menuList"></div>
-
-  <div class="section">
-    <div class="section-head"><h3>Galeri sanggar</h3></div>
-  </div>
-  <div class="hcards" id="galleryRow">
-    <div class="hcard card"><img class="thumb" src="assets/st.jpg" onerror="this.style.display='none'"/></div>
-    <div class="hcard card"><img class="thumb" src="assets/topeng.jpg" onerror="this.style.display='none'"/></div>
-    <div class="hcard card"><img class="thumb" src="assets/sanggar-tari.jpg" onerror="this.style.display='none'"/></div>
-  </div>
-
-  <div class="section" id="lokasi">
-    <div class="section-head"><h3>Lokasi sanggar</h3></div>
-    <div class="card card-pad">
-      <p style="margin-bottom:10px"><strong>Sanggar Asmorobangun</strong><br/>Dusun Kedungmonggo, Desa Karangpandan, Kec. Pakisaji, Kab. Malang, Jawa Timur.</p>
-      <iframe class="map-embed" loading="lazy"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=112.5850%2C-8.0800%2C112.6250%2C-8.0500&layer=mapnik&marker=-8.0656%2C112.6040"></iframe>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <a class="btn btn-outline btn-sm" style="flex:1" href="https://www.google.com/maps/search/Sanggar+Asmorobangun+Pakisaji+Malang" target="_blank">Buka di Google Maps</a>
-        <a class="btn btn-primary btn-sm" style="flex:1" href="https://wa.me/6281234567890" target="_blank">💬 WhatsApp Admin</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head"><h3>Forum diskusi</h3><a class="see-all" href="forum.html">Buka forum</a></div>
-    <div class="card card-pad" style="text-align:center">
-      <p>Punya pertanyaan atau mau berbagi pengalaman soal sanggar? Gabung diskusi warga & alumni kelas di sini.</p>
-      <a class="btn btn-primary" href="forum.html">💬 Masuk ke Forum</a>
-    </div>
-  </div>
-
+<div class="app-shell" id="appShell">
+  <div id="app"><div class="section"><div class="empty-state">Memuat...</div></div></div>
 </div>
-
-<script src="js/api.js"></script>
-<script src="js/nav.js"></script>
-<script>
-async function loadHome() {
-  try {
-    const ann = await api("/announcements");
-    const row = document.getElementById("statusRow");
-    row.innerHTML = ann.announcements
-      .map(
-        (a) => `<div class="status-item" onclick="alert('${escapeHtml(a.title)}\\n\\n${escapeHtml(a.body)}')">
-          <div class="status-ring"><div class="status-ring-inner">📢</div></div>
-          <span>${a.title.length > 12 ? a.title.slice(0, 11) + "…" : a.title}</span>
-        </div>`
-      )
-      .join("") + `<div class="status-item"><a href="articles.html" style="text-decoration:none;color:inherit">
-          <div class="status-ring" style="background:var(--cream-300)"><div class="status-ring-inner" style="background:var(--cream-300);color:var(--wood-800)">＋</div></div>
-          <span>Lainnya</span></a></div>`;
-  } catch (e) {}
-
-  try {
-    const data = await api("/articles?limit=1");
-    if (data.featured) {
-      const a = data.featured;
-      document.getElementById("featuredArticle").innerHTML = `
-        <a class="card" href="article-detail.html?slug=${a.slug}" style="display:block">
-          <img class="thumb" style="height:150px" src="assets/${a.image}" onerror="this.style.display='none'"/>
-          <div class="card-pad">
-            <span class="tag">${a.category}</span>
-            <h4 style="margin-top:8px">${a.title}</h4>
-            <p style="font-size:0.85rem;color:var(--ink-soft)">${a.excerpt}</p>
-          </div>
-        </a>`;
-    }
-  } catch (e) {}
-
-  try {
-    const data = await api("/facilities");
-    const list = document.getElementById("menuList");
-    list.innerHTML = data.facilities
-      .map(
-        (f) => `<a class="menu-row" href="facility-detail.html?id=${f.id}">
-          <div class="m-icon">${facilityIcon(f.id)}</div>
-          <div class="m-body">
-            <div class="m-title">${f.name}</div>
-            <div class="m-sub">${f.shortDesc}</div>
-          </div>
-          <div class="m-meta">${f.avgRating ? "⭐ " + f.avgRating : ""}</div>
-        </a>`
-      )
-      .join("");
-  } catch (e) {}
-}
-function facilityIcon(id) {
-  const map = { "panggilan-tari": "🎪", "kunjungan-edukasi": "🏫", "les-tari-wisata": "🎫", "les-tari-reguler": "💃", "les-karawitan": "🥁", "sewa-kostum": "👘" };
-  return map[id] || "🎭";
-}
-loadHome();
-renderChrome("home");
-</script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
