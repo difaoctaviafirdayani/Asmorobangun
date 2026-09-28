@@ -1,9 +1,10 @@
 import { api, formatDate, escapeHtml, showToast } from "../api.js";
-import { renderMediaPickerField, wireMediaPickerField } from "../mediaPicker.js";
+import { renderImageField, wireImageField } from "../imageField.js";
+import { icon } from "../icons.js";
 
 async function render(el) {
   el.innerHTML = `
-    <div class="a-toolbar"><button class="a-btn a-btn-primary" id="addBtn">➕ Tulis Artikel</button></div>
+    <div class="a-toolbar"><button class="a-btn a-btn-primary" id="addBtn">${icon("plus")} Tulis Artikel</button></div>
     <div class="a-card"><div class="a-table-wrap"><table class="a-table"><thead><tr><th>Judul</th><th>Kategori</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody id="tbody"><tr><td colspan="4">Memuat...</td></tr></tbody></table></div></div>
     <div class="a-modal-overlay" id="formModal"><div class="a-modal" id="formModalBody"></div></div>
   `;
@@ -56,14 +57,14 @@ function openForm(a) {
       </div>
       <div class="a-field"><label>Ringkasan</label><textarea name="excerpt" rows="2">${a ? escapeHtml(a.excerpt) : ""}</textarea></div>
       <div class="a-field"><label>Isi artikel</label><textarea name="content" rows="6">${a ? escapeHtml(a.content) : ""}</textarea></div>
-      ${renderMediaPickerField(fieldId, "Gambar Sampul", a ? a.image : "")}
+      ${renderImageField(fieldId, "Gambar Sampul", a ? a.image : "")}
       <div style="display:flex;gap:8px;margin-top:6px">
         <button type="button" class="a-btn a-btn-ghost" id="cancelForm" style="flex:1;justify-content:center">Batal</button>
         <button type="submit" class="a-btn a-btn-primary" style="flex:1;justify-content:center">Simpan</button>
       </div>
     </form>`;
   modal.classList.add("open");
-  wireMediaPickerField(fieldId);
+  wireImageField(fieldId);
   document.getElementById("cancelForm").addEventListener("click", () => modal.classList.remove("open"));
   document.getElementById("aForm").addEventListener("submit", async (e) => {
     e.preventDefault();

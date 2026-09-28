@@ -1,9 +1,10 @@
 import { api, assetUrl, escapeHtml, showToast } from "../api.js";
-import { renderMediaPickerField, wireMediaPickerField } from "../mediaPicker.js";
+import { renderImageField, wireImageField } from "../imageField.js";
+import { icon } from "../icons.js";
 
 async function render(el) {
   el.innerHTML = `
-    <div class="a-toolbar"><button class="a-btn a-btn-primary" id="addBtn">➕ Tambah Foto</button></div>
+    <div class="a-toolbar"><button class="a-btn a-btn-primary" id="addBtn">${icon("plus")} Tambah Foto</button></div>
     <div class="a-media-grid" id="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));max-height:none">Memuat...</div>
     <div class="a-modal-overlay" id="formModal"><div class="a-modal" id="formModalBody"></div></div>
   `;
@@ -50,14 +51,14 @@ function openForm(g) {
     <form id="gForm">
       <div class="a-field"><label>Judul</label><input name="title" required value="${g ? escapeHtml(g.title) : ""}" /></div>
       <div class="a-field"><label>Keterangan</label><textarea name="caption" rows="2">${g ? escapeHtml(g.caption || "") : ""}</textarea></div>
-      ${renderMediaPickerField(fieldId, "Gambar", g ? g.image : "")}
+      ${renderImageField(fieldId, "Gambar", g ? g.image : "")}
       <div style="display:flex;gap:8px;margin-top:6px">
         <button type="button" class="a-btn a-btn-ghost" id="cancelForm" style="flex:1;justify-content:center">Batal</button>
         <button type="submit" class="a-btn a-btn-primary" style="flex:1;justify-content:center">Simpan</button>
       </div>
     </form>`;
   modal.classList.add("open");
-  wireMediaPickerField(fieldId);
+  wireImageField(fieldId);
   document.getElementById("cancelForm").addEventListener("click", () => modal.classList.remove("open"));
   document.getElementById("gForm").addEventListener("submit", async (e) => {
     e.preventDefault();

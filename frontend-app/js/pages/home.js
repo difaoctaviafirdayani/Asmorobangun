@@ -1,11 +1,12 @@
 import { api, assetUrl, escapeHtml, formatDateShort } from "../api.js";
 import { topbar } from "../chrome.js";
+import { icon } from "../icons.js";
 
-const FACILITY_ICONS = { "panggilan-tari": "🎪", "kunjungan-edukasi": "🏫", "les-tari-wisata": "🎫", "les-tari-reguler": "💃", "les-karawitan": "🥁", "sewa-kostum": "👘" };
+const FACILITY_ICONS = { "panggilan-tari": "event", "kunjungan-edukasi": "school", "les-tari-wisata": "ticket", "les-tari-reguler": "dance", "les-karawitan": "music", "sewa-kostum": "costume" };
 
 async function render(container) {
   container.innerHTML = `
-    ${topbar({ search: "bar", cart: true })}
+    ${topbar({ search: "bar", cart: true, brand: true })}
 
     <div class="section" style="padding-top:14px;padding-bottom:4px">
       <div class="card" style="overflow:hidden">
@@ -41,7 +42,7 @@ async function render(container) {
           src="https://www.openstreetmap.org/export/embed.html?bbox=112.5850%2C-8.0800%2C112.6250%2C-8.0500&layer=mapnik&marker=-8.0656%2C112.6040"></iframe>
         <div style="display:flex;gap:8px;margin-top:12px">
           <a class="btn btn-outline btn-sm" style="flex:1" href="https://www.google.com/maps/search/Sanggar+Asmorobangun+Pakisaji+Malang" target="_blank">Buka di Google Maps</a>
-          <a class="btn btn-primary btn-sm" style="flex:1" href="https://wa.me/6281234567890" target="_blank">💬 WhatsApp Admin</a>
+          <a class="btn btn-primary btn-sm" style="flex:1" href="https://wa.me/6281234567890" target="_blank" rel="noopener">${icon("whatsapp")} WhatsApp Admin</a>
         </div>
       </div>
     </div>
@@ -50,7 +51,7 @@ async function render(container) {
       <div class="section-head"><h3>Forum diskusi</h3><a class="see-all" href="#/forum">Buka forum</a></div>
       <div class="card card-pad" style="text-align:center">
         <p>Punya pertanyaan atau mau berbagi pengalaman soal sanggar? Gabung diskusi warga &amp; alumni kelas di sini.</p>
-        <a class="btn btn-primary" href="#/forum">💬 Masuk ke Forum</a>
+        <a class="btn btn-primary" href="#/forum">${icon("forum")} Masuk ke Forum</a>
       </div>
     </div>
   `;
@@ -96,12 +97,12 @@ async function render(container) {
     document.getElementById("menuList").innerHTML = data.facilities
       .map(
         (f) => `<a class="menu-row" href="#/facilities/${f.id}">
-          <div class="m-icon">${FACILITY_ICONS[f.id] || "🎭"}</div>
+          <div class="m-icon">${icon(FACILITY_ICONS[f.id] || "facilities")}</div>
           <div class="m-body">
             <div class="m-title">${escapeHtml(f.name)}</div>
             <div class="m-sub">${escapeHtml(f.shortDesc)}</div>
           </div>
-          <div class="m-meta">${f.avgRating ? "⭐ " + f.avgRating : ""}</div>
+          <div class="m-meta">${f.avgRating ? icon("star") + " " + f.avgRating : ""}</div>
         </a>`
       )
       .join("");

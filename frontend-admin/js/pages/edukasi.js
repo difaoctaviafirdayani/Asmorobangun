@@ -1,4 +1,5 @@
 import { api, escapeHtml, showToast } from "../api.js";
+import { icon } from "../icons.js";
 
 async function render(el) {
   el.innerHTML = `<div id="wrap">Memuat...</div>`;
@@ -31,7 +32,7 @@ async function load() {
         <div class="a-field"><label>Tahun</label><input id="newYear" placeholder="mis. 1930" /></div>
         <div class="a-field" style="grid-column:span 2"><label>Keterangan</label><input id="newText" placeholder="Peristiwa penting..." /></div>
       </div>
-      <button class="a-btn a-btn-outline" id="addTimeline">➕ Tambah Poin</button>
+      <button class="a-btn a-btn-outline" id="addTimeline">${icon("plus")} Tambah Poin</button>
     </div>
   `;
 

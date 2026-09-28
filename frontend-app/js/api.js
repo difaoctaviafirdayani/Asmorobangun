@@ -1,3 +1,4 @@
+import { icon } from "./icons.js";
 // Central place to point the app frontend at the backend API.
 // Change this if you deploy the backend somewhere other than localhost:4000.
 export const API_BASE = window.__API_BASE__ || "http://localhost:4000/api";
@@ -114,7 +115,7 @@ export function formatRupiah(n) {
 
 export function stars(rating) {
   const r = Math.round(rating || 0);
-  return "★".repeat(r) + "☆".repeat(5 - r);
+  return icon("star").repeat(r) + icon("star-empty").repeat(5 - r);
 }
 
 export function statusLabel(status) {

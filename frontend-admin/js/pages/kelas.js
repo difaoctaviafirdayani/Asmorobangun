@@ -1,5 +1,5 @@
-import { api, escapeHtml, showToast, assetUrl } from "../api.js";
-import { renderMediaPickerField, wireMediaPickerField } from "../mediaPicker.js";
+import { api, escapeHtml, showToast } from "../api.js";
+import { renderImageField, wireImageField } from "../imageField.js";
 
 // Baca pengaturan metode pembayaran per fasilitas (default: semua aktif)
 function readMethods(f) {
@@ -28,70 +28,40 @@ async function render(el) {
           <div class="a-field">
             <label>Metode Pembayaran</label>
 
-            <div style="border:1.5px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px">
-              <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-bottom:8px">
-                <input type="checkbox" name="cashEnabled" style="width:auto" ${m.cash.enabled ? "checked" : ""} /> Tunai
+            <div class="a-method-box">
+              <label class="a-check-label">
+                <input type="checkbox" name="cashEnabled" ${m.cash.enabled ? "checked" : ""} /> Tunai
               </label>
-              <label style="font-size:0.75rem;font-weight:600">Catatan</label>
+              <label class="a-sublabel">Catatan</label>
               <input name="cashNote" placeholder="mis. Bayar di sanggar" value="${escapeHtml(m.cash.note)}" />
             </div>
 
-            <div style="border:1.5px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px">
-              <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-bottom:8px">
-                <input type="checkbox" name="transferEnabled" style="width:auto" ${m.transfer.enabled ? "checked" : ""} /> Transfer Bank
+            <div class="a-method-box">
+              <label class="a-check-label">
+                <input type="checkbox" name="transferEnabled" ${m.transfer.enabled ? "checked" : ""} /> Transfer Bank
               </label>
-              <label style="font-size:0.75rem;font-weight:600">Catatan</label>
+              <label class="a-sublabel">Catatan</label>
               <input name="transferNote" placeholder="mis. 1234567890 (BCA a.n. Sanggar Asmorobangun)" value="${escapeHtml(m.transfer.note)}" />
             </div>
 
-            <div style="border:1.5px solid var(--line);border-radius:10px;padding:12px">
-              <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-bottom:8px">
-                <input type="checkbox" name="qrisEnabled" style="width:auto" ${m.qris.enabled ? "checked" : ""} /> QRIS
+            <div class="a-method-box">
+              <label class="a-check-label">
+                <input type="checkbox" name="qrisEnabled" ${m.qris.enabled ? "checked" : ""} /> QRIS
               </label>
-              <label style="font-size:0.75rem;font-weight:600">Gambar QRIS Merchant</label>
-              <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
-                <img class="a-picker-preview" id="qrisPrev-${f.id}" src="${m.qris.image ? assetUrl(m.qris.image) : ""}" onerror="this.style.opacity=0" />
-                <div>
-                  <input type="hidden" name="qrisImage" value="${escapeHtml(m.qris.image)}" />
-                  <input type="file" accept="image/*" id="qrisFile-${f.id}" style="display:none" />
-                  <button type="button" class="a-btn a-btn-outline a-btn-sm" data-upload-qris="${f.id}">⬆️ Unggah QRIS</button>
-                </div>
-              </div>
+              ${renderImageField(`qris-${f.id}`, "Gambar QRIS Merchant", m.qris.image)}
             </div>
           </div>
 
-          ${renderMediaPickerField(`img-${f.id}`, "Gambar", f.image)}
+          ${renderImageField(`img-${f.id}`, "Gambar", f.image)}
           <button class="a-btn a-btn-primary" type="submit">Simpan</button>
         </form>
       </div>`;
     })
     .join("");
 
-  facilities.forEach((f) => wireMediaPickerField(`img-${f.id}`));
-
-  // Unggah gambar QRIS
-  document.querySelectorAll("[data-upload-qris]").forEach((btn) => {
-    const fid = btn.getAttribute("data-upload-qris");
-    const fileInput = document.getElementById(`qrisFile-${fid}`);
-    btn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      const fd = new FormData();
-      fd.append("image", file);
-      try {
-        const { item } = await api("/uploads/image", { method: "POST", isForm: true, body: fd });
-        const form = document.querySelector(`form[data-fid="${fid}"]`);
-        form.elements["qrisImage"].value = item.url;
-        const prev = document.getElementById(`qrisPrev-${fid}`);
-        prev.src = assetUrl(item.url);
-        prev.style.opacity = 1;
-        showToast("Gambar QRIS diunggah. Klik Simpan untuk menyimpan.");
-      } catch (err) {
-        showToast(err.message);
-      }
-      fileInput.value = "";
-    });
+  facilities.forEach((f) => {
+    wireImageField(`img-${f.id}`);
+    wireImageField(`qris-${f.id}`);
   });
 
   // Simpan
@@ -108,7 +78,7 @@ async function render(el) {
         paymentMethods: {
           cash: { enabled: g("cashEnabled").checked, note: g("cashNote").value },
           transfer: { enabled: g("transferEnabled").checked, note: g("transferNote").value },
-          qris: { enabled: g("qrisEnabled").checked, image: g("qrisImage").value },
+          qris: { enabled: g("qrisEnabled").checked, image: document.getElementById(`qris-${fid}`).value },
         },
       };
       try {

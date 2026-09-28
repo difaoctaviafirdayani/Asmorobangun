@@ -8,16 +8,6 @@ const { makeUploader } = require("../upload");
 const router = express.Router();
 const uploadProof = makeUploader("payment_proof");
 
-function requirePhoneVerified(req, res) {
-  const db = readDB();
-  const user = db.users.find((u) => u.id === req.user.id);
-  if (!user || !user.phoneVerified) {
-    res.status(403).json({ error: "Verifikasi nomor HP dulu sebelum melihat detail pembayaran ini.", needsPhoneVerification: true });
-    return false;
-  }
-  return true;
-}
-
 router.get("/", (req, res) => {
   const db = readDB();
   res.json({ topeng: db.topeng });
@@ -84,11 +74,13 @@ router.post("/orders/:orderId/message", requireAuth, async (req, res) => {
 });
 
 router.get("/orders/:orderId/qris", requireAuth, async (req, res) => {
-  if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
   const order = db.topengOrders.find((o) => o.id === req.params.orderId);
   if (!order) return res.status(404).json({ error: "Pesanan tidak ditemukan." });
   if (order.userId !== req.user.id && req.user.role !== "admin") return res.status(403).json({ error: "Tidak diizinkan." });
+  if (db.paymentSettings.qrisImage) {
+    return res.json({ qris: db.paymentSettings.qrisImage, amount: order.total, note: "Scan QRIS sanggar, lalu unggah bukti pembayaran." });
+  }
   const payload = `ASMOROBANGUN|ORDER:${order.id}|NOMINAL:${order.total}|${db.paymentSettings.qrisMerchantName}`;
   try {
     const dataUrl = await QRCode.toDataURL(payload, { margin: 1, width: 320 });
@@ -100,7 +92,6 @@ router.get("/orders/:orderId/qris", requireAuth, async (req, res) => {
 
 // GET /api/topeng/orders/:orderId/transfer -- bank account details, only after phone verification
 router.get("/orders/:orderId/transfer", requireAuth, (req, res) => {
-  if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
   const order = db.topengOrders.find((o) => o.id === req.params.orderId);
   if (!order) return res.status(404).json({ error: "Pesanan tidak ditemukan." });
@@ -123,6 +114,21 @@ router.post("/orders/:orderId/proof", requireAuth, uploadProof.single("proof"), 
     o.status = "menunggu_verifikasi";
   });
   res.json({ message: "Bukti pembayaran diunggah.", proofFile: fileUrl });
+});
+
+// POST /api/topeng/orders/:orderId/cash -- pilih bayar tunai (tanpa bukti pembayaran)
+router.post("/orders/:orderId/cash", requireAuth, async (req, res) => {
+  const db = readDB();
+  const order = db.topengOrders.find((o) => o.id === req.params.orderId);
+  if (!order) return res.status(404).json({ error: "Pesanan tidak ditemukan." });
+  if (order.userId !== req.user.id) return res.status(403).json({ error: "Tidak diizinkan." });
+  if (order.proofFile) return res.status(400).json({ error: "Bukti pembayaran sudah diunggah untuk pesanan ini." });
+  await update((data) => {
+    const o = data.topengOrders.find((x) => x.id === req.params.orderId);
+    o.paymentMethod = "cash";
+    o.chatLog.push({ from: "system", text: "Pembeli memilih pembayaran tunai (bayar langsung di sanggar).", date: new Date().toISOString() });
+  });
+  res.json({ message: "Pembayaran tunai dicatat.", paymentMethod: "cash" });
 });
 
 router.get("/orders/mine", requireAuth, (req, res) => {

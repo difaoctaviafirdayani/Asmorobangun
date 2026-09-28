@@ -30,24 +30,4 @@ function makeUploader(subfolder) {
   });
 }
 
-// Uploader for a raw .zip file (admin bulk image upload). Kept separate from
-// makeUploader() because the file filter needs to accept .zip specifically
-// and we don't want to rename/move it until we've extracted its contents.
-function makeZipUploader() {
-  const tmpDir = path.join(UPLOADS_ROOT, "_tmp_zip");
-  ensureDir(tmpDir);
-  const storage = multer.diskStorage({
-    destination: tmpDir,
-    filename: (req, file, cb) => cb(null, `${Date.now()}-${nanoid(8)}.zip`),
-  });
-  return multer({
-    storage,
-    limits: { fileSize: 40 * 1024 * 1024 }, // 40MB zip
-    fileFilter: (req, file, cb) => {
-      if (/\.zip$/i.test(file.originalname)) cb(null, true);
-      else cb(new Error("File harus berformat .zip"));
-    },
-  });
-}
-
-module.exports = { makeUploader, makeZipUploader, UPLOADS_ROOT, ensureDir };
+module.exports = { makeUploader, UPLOADS_ROOT, ensureDir };

@@ -1,3 +1,4 @@
+import { icon } from "../icons.js";
 import { api, assetUrl, escapeHtml, formatDate } from "../api.js";
 
 let activeCategory = "";
@@ -6,7 +7,7 @@ async function render(container) {
   container.innerHTML = `
     <div class="topbar">
       <div class="topbar-row">
-        <button class="icon-btn" data-nav="#/">←</button>
+        <button class="icon-btn" data-nav="#/">${icon("back")}</button>
         <div class="wordmark" style="font-size:1.05rem">Artikel &amp; Berita</div>
       </div>
       <div class="search-bar" style="cursor:text">
@@ -76,7 +77,7 @@ async function loadArticles() {
           </a>`
         )
         .join("")
-    : `<div class="empty-state"><div class="e-icon">📰</div>Belum ada artikel yang cocok.</div>`;
+    : `<div class="empty-state"><div class="e-icon">${icon("article")}</div>Belum ada artikel yang cocok.</div>`;
 }
 
 export default { nav: "", render };

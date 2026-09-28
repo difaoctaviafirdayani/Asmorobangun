@@ -1,3 +1,4 @@
+import { icon } from "../icons.js";
 import { api, requireLoginOrRedirect, formatRupiah, statusLabel, escapeHtml, showToast } from "../api.js";
 import { mountTopengAI } from "../topeng-ai.js";
 import { renderPaymentBlock } from "../payment.js";
@@ -5,7 +6,7 @@ import { renderPaymentBlock } from "../payment.js";
 async function render(container, { id: oid }) {
   if (!requireLoginOrRedirect()) return;
   container.innerHTML = `
-    <div class="back-row"><button class="back-btn" data-nav="#/my-orders">←</button></div>
+    <div class="back-row"><button class="back-btn" data-nav="#/my-orders">${icon("back")}</button></div>
     <div id="content" class="section">Memuat...</div>
   `;
   await load(oid);

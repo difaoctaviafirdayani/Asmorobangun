@@ -1,9 +1,10 @@
 import { api, requireLoginOrRedirect, formatRupiah, formatDate, statusLabel, escapeHtml, assetUrl } from "../api.js";
+import { icon } from "../icons.js";
 
 async function render(container) {
   if (!requireLoginOrRedirect()) return;
   container.innerHTML = `
-    <div class="topbar"><div class="topbar-row"><button class="icon-btn" data-nav="#/profile">←</button><div class="wordmark" style="font-size:1.05rem">Pesanan Saya</div></div></div>
+    <div class="topbar"><div class="topbar-row"><button class="icon-btn" data-nav="#/profile">${icon("back")}</button><div class="wordmark" style="font-size:1.05rem">Pesanan Saya</div></div></div>
     <div class="section" style="display:flex;gap:8px" id="tabRow">
       <button class="tag" data-tab="topeng" style="background:var(--wood-800);color:#fff;border:none">Pesanan Topeng</button>
       <button class="tag" data-tab="bookings" style="background:var(--cream-300);color:var(--wood-900);border:none">Pendaftaran &amp; Booking</button>
@@ -44,7 +45,7 @@ async function paint(tab) {
             </a>`;
           })
           .join("")
-      : `<div class="empty-state"><div class="e-icon">🪆</div>Belum ada pesanan topeng.</div>`;
+      : `<div class="empty-state"><div class="e-icon">${icon("topeng")}</div>Belum ada pesanan topeng.</div>`;
   } else {
     const { bookings } = await api("/bookings/mine", { auth: true });
     list.innerHTML = bookings.length
@@ -52,7 +53,7 @@ async function paint(tab) {
           .map((b) => {
             const [label, tone] = statusLabel(b.status);
             return `<div class="menu-row">
-              <div class="m-icon">🎭</div>
+              <div class="m-icon">${icon("facilities")}</div>
               <div class="m-body">
                 <div class="m-title">${escapeHtml(b.facilityName)}</div>
                 <div class="m-sub">${b.date ? formatDate(b.date) : ""} ${b.amount ? "· " + formatRupiah(b.amount) : ""}</div>
@@ -61,7 +62,7 @@ async function paint(tab) {
             </div>`;
           })
           .join("")
-      : `<div class="empty-state"><div class="e-icon">🎭</div>Belum ada pendaftaran/booking.</div>`;
+      : `<div class="empty-state"><div class="e-icon">${icon("facilities")}</div>Belum ada pendaftaran/booking.</div>`;
   }
 }
 

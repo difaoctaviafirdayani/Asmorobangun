@@ -1,3 +1,4 @@
+import { icon } from "../icons.js";
 import { api, formatRupiah, assetUrl, escapeHtml } from "../api.js";
 import { mountTopengAI } from "../topeng-ai.js";
 
@@ -5,12 +6,12 @@ async function render(container) {
   container.innerHTML = `
     <div class="topbar">
       <div class="topbar-row">
-        <button class="icon-btn" data-nav="#/">←</button>
+        <button class="icon-btn" data-nav="#/">${icon("back")}</button>
         <div class="wordmark" style="font-size:1.05rem">Toko Topeng Malangan</div>
       </div>
     </div>
     <div class="section">
-      <p style="font-size:0.85rem;color:var(--ink-soft)">Setiap topeng diukir tangan oleh pengrajin sanggar. Bisa request nama &amp; desain custom saat memesan. Ada pertanyaan soal topeng? Tanya Asisten Topeng di pojok kanan bawah 🎭</p>
+      <p style="font-size:0.85rem;color:var(--ink-soft)">Setiap topeng diukir tangan oleh pengrajin sanggar. Bisa request nama &amp; desain custom saat memesan. Ada pertanyaan soal topeng? Tanya Asisten Topeng di pojok kanan bawah.</p>
     </div>
     <div class="tile-grid" id="grid"><div class="empty-state">Memuat...</div></div>
   `;

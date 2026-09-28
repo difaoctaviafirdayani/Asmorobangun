@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Margarine&family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
   --wood-950: #241609; --wood-900: #3a2413; --wood-800: #55341e; --wood-700: #71481f;
@@ -9,8 +9,8 @@
   --sidebar-w: 250px;
 }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: 'Public Sans', system-ui, sans-serif; background: var(--canvas); color: var(--ink); }
-h1,h2,h3,h4 { font-family: 'Fraunces', Georgia, serif; color: var(--wood-900); margin: 0 0 8px; }
+body { margin: 0; font-family: 'Poppins', system-ui, sans-serif; background: var(--canvas); color: var(--ink); }
+h1,h2,h3,h4 { font-family: 'Margarine', 'Poppins', sans-serif; font-weight: 400; color: var(--wood-900); margin: 0 0 8px; letter-spacing: 0.01em; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
@@ -26,27 +26,29 @@ input, select, textarea { font-family: inherit; }
   transition: transform .22s ease; display: flex; flex-direction: column;
 }
 .a-sidebar.open { transform: translateX(0); }
-.a-brand { padding: 22px 20px; font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.2rem; color: var(--gold-300); border-bottom: 1px solid rgba(255,255,255,0.1); }
-.a-brand span { display: block; font-size: 0.65rem; color: rgba(251,247,239,0.6); font-family: 'Public Sans', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+.a-brand { padding: 22px 20px; font-family: 'Margarine', 'Poppins', sans-serif; font-weight: 400; font-size: 1.25rem; color: var(--gold-300); border-bottom: 1px solid rgba(255,255,255,0.1); }
+.a-brand span { display: block; font-size: 0.65rem; color: rgba(251,247,239,0.6); font-family: 'Poppins', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
 .a-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
 .a-nav a { display: flex; align-items: center; gap: 11px; padding: 11px 20px; font-size: 0.85rem; font-weight: 500; color: rgba(251,247,239,0.82); border-left: 3px solid transparent; }
 .a-nav a:hover { background: rgba(255,255,255,0.06); }
 .a-nav a.active { background: rgba(255,255,255,0.1); border-left-color: var(--gold-400); color: #fff; font-weight: 700; }
-.a-nav-icon { font-size: 1.05rem; width: 22px; text-align: center; }
+.a-nav-icon { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.a-nav-icon .ic { width: 20px; height: 20px; }
 .a-sidebar-foot { padding: 14px 20px 18px; border-top: 1px solid rgba(255,255,255,0.1); }
 .a-admin-chip { font-size: 0.78rem; margin-bottom: 10px; color: var(--cream-200); }
 .a-logout-btn { width: 100%; background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 9px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
 
 .a-main { min-height: 100vh; }
 .a-topbar { position: sticky; top: 0; z-index: 30; background: #fff; border-bottom: 1px solid var(--line); padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
-.a-hamburger { background: var(--cream-300); border: none; width: 38px; height: 38px; border-radius: 10px; font-size: 1.05rem; color: var(--wood-900); }
-.a-topbar-title { font-family: 'Fraunces', serif; font-weight: 700; color: var(--wood-950); font-size: 1.05rem; }
+.a-hamburger { background: var(--cream-300); border: none; width: 38px; height: 38px; border-radius: 10px; color: var(--wood-900); display: inline-flex; align-items: center; justify-content: center; }
+.a-hamburger .ic { width: 22px; height: 22px; }
+.a-topbar-title { font-family: 'Margarine', 'Poppins', sans-serif; font-weight: 400; color: var(--wood-950); font-size: 1.05rem; }
 .a-content { padding: 18px; max-width: 1100px; }
 
 /* ---------- Login ---------- */
 .a-login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(155deg, var(--wood-950), var(--wood-700)); padding: 20px; }
 .a-login-card { background: var(--cream-100); border-radius: 18px; padding: 32px 26px; width: 100%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-.a-login-card .a-brand-lg { font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.5rem; color: var(--wood-900); text-align: center; margin-bottom: 4px; }
+.a-login-card .a-brand-lg { font-family: 'Margarine', 'Poppins', sans-serif; font-weight: 400; font-size: 1.6rem; color: var(--wood-900); text-align: center; margin-bottom: 4px; }
 .a-login-card .a-sub { text-align: center; font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 22px; }
 
 /* ---------- Common UI ---------- */
@@ -54,7 +56,7 @@ input, select, textarea { font-family: inherit; }
 .a-card-pad { padding: 18px; }
 .a-grid-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
 .a-stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
-.a-stat .n { font-size: 1.5rem; font-weight: 700; color: var(--wood-900); font-family: 'Fraunces', serif; }
+.a-stat .n { font-size: 1.5rem; font-weight: 700; color: var(--wood-900); font-family: 'Poppins', sans-serif; }
 .a-stat .l { font-size: 0.75rem; color: var(--ink-soft); margin-top: 3px; }
 
 .a-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; justify-content: space-between; }
@@ -104,16 +106,11 @@ input, select, textarea { font-family: inherit; }
 }
 .a-toast.show { opacity: 1; }
 
-/* Media picker */
+/* Grid kartu foto (Kelola Galeri) */
 .a-media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; max-height: 320px; overflow-y: auto; padding: 4px; }
-.a-media-item { position: relative; border-radius: 9px; overflow: hidden; border: 2px solid var(--line); cursor: pointer; aspect-ratio: 1/1; }
-.a-media-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.a-media-item.selected { border-color: var(--wood-800); box-shadow: 0 0 0 2px var(--gold-400); }
-.a-media-item .del-btn { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 0.65rem; }
-.a-drop-zone {
-  border: 2px dashed var(--wood-600); border-radius: 12px; padding: 24px; text-align: center; color: var(--ink-soft);
-  font-size: 0.85rem; background: var(--cream-200); cursor: pointer;
-}
+
+/* Upload foto langsung di form */
+.a-upload { display: flex; gap: 12px; align-items: center; }
 .a-picker-preview { width: 84px; height: 84px; border-radius: 10px; object-fit: cover; border: 1.5px solid var(--line); background: var(--cream-300); }
 
 .a-modal-overlay { position: fixed; inset: 0; background: rgba(20,13,8,0.55); z-index: 80; display: none; align-items: center; justify-content: center; padding: 16px; }
@@ -143,3 +140,15 @@ input, select, textarea { font-family: inherit; }
   .a-form-grid { grid-template-columns: 1fr; }
   .a-content { padding: 14px; }
 }
+
+/* ---------- Ikon SVG ---------- */
+.ic { width: 1.2em; height: 1.2em; flex-shrink: 0; vertical-align: -0.24em; }
+.a-btn .ic { width: 1.15em; height: 1.15em; vertical-align: 0; }
+.a-detail-row { display: flex; align-items: center; gap: 8px; }
+.a-detail-row .ic { color: var(--wood-700); }
+
+/* ---------- Kotak metode pembayaran (Kelola Kelas/Fasilitas) ---------- */
+.a-method-box { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+.a-check-label { display: flex !important; gap: 8px; align-items: center; font-weight: 700; margin-bottom: 8px !important; }
+.a-check-label input { width: auto !important; }
+.a-sublabel { font-size: 0.75rem !important; font-weight: 600 !important; }

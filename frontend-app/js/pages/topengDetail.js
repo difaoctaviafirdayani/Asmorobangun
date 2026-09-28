@@ -1,9 +1,10 @@
+import { icon } from "../icons.js";
 import { api, isLoggedIn, requireLoginOrRedirect, formatRupiah, assetUrl, escapeHtml, showToast } from "../api.js";
 import { mountTopengAI } from "../topeng-ai.js";
 
 async function render(container, { id: tid }) {
   container.innerHTML = `
-    <div class="back-row"><button class="back-btn" data-nav="#/topeng">←</button></div>
+    <div class="back-row"><button class="back-btn" data-nav="#/topeng">${icon("back")}</button></div>
     <div id="content" class="section">Memuat...</div>
   `;
   try {
@@ -32,7 +33,7 @@ async function render(container, { id: tid }) {
           </div>
           <div class="field"><label>Nomor WhatsApp kamu</label><input id="buyerPhone" placeholder="08xxxxxxxxxx" /></div>
           <div class="field"><label>Catatan tambahan</label><textarea id="message" rows="2" placeholder="Pesan untuk admin (opsional)"></textarea></div>
-          <button class="btn btn-primary" id="submitOrderBtn">🛒 Pesan &amp; Lanjut Chat</button>
+          <button class="btn btn-primary" id="submitOrderBtn">${icon("shop")} Pesan &amp; Lanjut Chat</button>
         </div>
       </div>
     `;

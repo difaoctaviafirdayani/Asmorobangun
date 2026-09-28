@@ -1,11 +1,12 @@
 import { api, formatDate, escapeHtml, showToast } from "../api.js";
-import { renderMediaPickerField, wireMediaPickerField } from "../mediaPicker.js";
+import { renderImageField, wireImageField } from "../imageField.js";
+import { icon } from "../icons.js";
 
 const TYPES = ["Pengumuman", "Jadwal", "Info Pendaftaran", "Kegiatan", "Berita Sanggar"];
 
 async function render(el) {
   el.innerHTML = `
-    <div class="a-toolbar"><button class="a-btn a-btn-primary" id="addBtn">➕ Tulis Pengumuman</button></div>
+    <div class="a-toolbar"><button class="a-btn a-btn-primary" id="addBtn">${icon("plus")} Tulis Pengumuman</button></div>
     <div class="a-card"><div class="a-table-wrap"><table class="a-table"><thead><tr><th>Judul</th><th>Tipe</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody id="tbody"><tr><td colspan="4">Memuat...</td></tr></tbody></table></div></div>
     <div class="a-modal-overlay" id="formModal"><div class="a-modal" id="formModalBody"></div></div>
   `;
@@ -54,7 +55,7 @@ function openForm(a) {
         <select name="type">${TYPES.map((t) => `<option ${a && a.type === t ? "selected" : ""}>${t}</option>`).join("")}</select>
       </div>
       <div class="a-field"><label>Isi pengumuman</label><textarea name="body" rows="5" required>${a ? escapeHtml(a.body) : ""}</textarea></div>
-      ${renderMediaPickerField(fieldId, "Gambar (opsional)", a ? a.image : "")}
+      ${renderImageField(fieldId, "Gambar (opsional)", a ? a.image : "")}
       <div class="a-field-hint" style="margin:-6px 0 12px">Ditampilkan sebagai kartu berita di beranda &amp; halaman Pengumuman, bukan status.</div>
       <div style="display:flex;gap:8px;margin-top:6px">
         <button type="button" class="a-btn a-btn-ghost" id="cancelForm" style="flex:1;justify-content:center">Batal</button>
@@ -62,7 +63,7 @@ function openForm(a) {
       </div>
     </form>`;
   modal.classList.add("open");
-  wireMediaPickerField(fieldId);
+  wireImageField(fieldId);
   document.getElementById("cancelForm").addEventListener("click", () => modal.classList.remove("open"));
   document.getElementById("pForm").addEventListener("submit", async (e) => {
     e.preventDefault();

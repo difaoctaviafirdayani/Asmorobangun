@@ -1,10 +1,11 @@
+import { icon } from "../icons.js";
 import { api, assetUrl, escapeHtml, formatDate } from "../api.js";
 
 async function render(container) {
   container.innerHTML = `
     <div class="topbar">
       <div class="topbar-row">
-        <button class="icon-btn" data-nav="#/">←</button>
+        <button class="icon-btn" data-nav="#/">${icon("back")}</button>
         <div class="wordmark" style="font-size:1.05rem">Galeri Sanggar</div>
       </div>
     </div>
@@ -14,7 +15,7 @@ async function render(container) {
     <div class="gallery-grid" id="grid"><div class="empty-state">Memuat...</div></div>
 
     <div class="lightbox" id="lightbox">
-      <button class="lb-close" id="lbClose">✕</button>
+      <button class="lb-close" id="lbClose" aria-label="Tutup">${icon("close")}</button>
       <img id="lbImg" />
       <div class="lb-cap" id="lbCap"></div>
     </div>
@@ -33,7 +34,7 @@ async function render(container) {
             </div>`
           )
           .join("")
-      : `<div class="empty-state"><div class="e-icon">🖼️</div>Belum ada foto galeri.</div>`;
+      : `<div class="empty-state"><div class="e-icon">${icon("gallery")}</div>Belum ada foto galeri.</div>`;
   } catch (e) {
     document.getElementById("grid").innerHTML = `<div class="empty-state">Gagal memuat galeri.</div>`;
   }

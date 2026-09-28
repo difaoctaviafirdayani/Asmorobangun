@@ -1,0 +1,7 @@
+Letakkan file font "Upakarti.ttf" di folder ini (frontend-app/fonts/).
+
+Nama file boleh "Upakarti.ttf" atau "upakarti.ttf" (dua-duanya sudah didaftarkan di css/style.css).
+Setelah file ada, judul "ASMOROBANGUN" di beranda otomatis memakai font tersebut.
+Selama file belum ada, judul memakai font cadangan (Margarine) supaya tampilan tidak rusak.
+
+Catatan: pastikan lisensi font Upakarti membolehkan dipakai di website.

@@ -1,4 +1,5 @@
 import { api, escapeHtml } from "./api.js";
+import { icon } from "./icons.js";
 
 let mounted = false;
 
@@ -10,7 +11,7 @@ export function mountTopengAI() {
   const fab = document.createElement("button");
   fab.className = "ai-fab";
   fab.id = "topengAiFab";
-  fab.innerHTML = "🎭";
+  fab.innerHTML = icon("chat");
   fab.title = "Tanya Asisten Topeng";
   fab.addEventListener("click", openAI);
   shell.appendChild(fab);
@@ -21,15 +22,15 @@ export function mountTopengAI() {
   panel.innerHTML = `
     <div class="ai-sheet">
       <div class="ai-sheet-head">
-        <div style="font-size:1.3rem">🎭</div>
+        <div style="font-size:1.4rem;line-height:0">${icon("topeng")}</div>
         <div style="flex:1">
           <div style="font-weight:700;font-size:0.92rem">Asisten Topeng</div>
           <div style="font-size:0.7rem;opacity:0.75">Tanya apapun soal Topeng Malangan — tanpa batas</div>
         </div>
-        <button class="icon-btn" id="closeAiBtn">✕</button>
+        <button class="icon-btn" id="closeAiBtn" aria-label="Tutup">${icon("close")}</button>
       </div>
       <div class="ai-sheet-body" id="aiMessages">
-        <div class="chat-bubble admin">Halo! Aku Asisten Topeng 🎭 — tanya apa saja soal Topeng Malangan: sejarah, tokoh &amp; watak, bahan, cara merawat, sampai katalog yang dijual di sini.</div>
+        <div class="chat-bubble admin">Halo! Aku Asisten Topeng. Tanya apa saja soal Topeng Malangan: sejarah, tokoh &amp; watak, bahan, cara merawat, sampai katalog yang dijual di sini.</div>
       </div>
       <div class="ai-sheet-foot">
         <input id="aiInput" placeholder="Tulis pertanyaan tentang topeng..." />

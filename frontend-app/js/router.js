@@ -1,4 +1,5 @@
 import { renderBottomNav } from "./chrome.js";
+import { icon } from "./icons.js";
 import { unmountTopengAI } from "./topeng-ai.js";
 
 import homePage from "./pages/home.js";
@@ -64,7 +65,7 @@ export async function renderRoute() {
   }
 
   if (!matched) {
-    app.innerHTML = `<div class="section"><div class="empty-state"><div class="e-icon">🗺️</div>Halaman tidak ditemukan.</div></div>`;
+    app.innerHTML = `<div class="section"><div class="empty-state"><div class="e-icon">${icon("map")}</div>Halaman tidak ditemukan.</div></div>`;
     renderBottomNav("");
     window.scrollTo(0, 0);
     return;

@@ -1,8 +1,9 @@
+import { icon } from "../icons.js";
 import { api, assetUrl, escapeHtml, formatDate } from "../api.js";
 
 async function render(container, { id }) {
   container.innerHTML = `
-    <div class="back-row"><button class="back-btn" data-nav="#/announcements">←</button></div>
+    <div class="back-row"><button class="back-btn" data-nav="#/announcements">${icon("back")}</button></div>
     <div id="content" class="section">Memuat...</div>
   `;
   try {

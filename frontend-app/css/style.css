@@ -1,12 +1,21 @@
 /* =========================================================
    Asmorobangun — Frontend App (user-facing SPA)
-   Palette leans fully into carved-wood browns and sawo-matang
-   cream, with a small aged-gold accent kept for emphasis only.
-   Typeface pairing: warm serif ("Fraunces") for anything that
-   carries the sanggar's voice, set against a plain sans
-   ("Public Sans") for everything functional.
+   Palet: coklat kayu tua & krem sawo matang, aksen emas tua.
+   Font:
+     - Upakarti (lokal, fonts/Upakarti.ttf) -> judul ASMOROBANGUN di beranda
+     - Margarine (Google Fonts)             -> judul/heading
+     - Poppins   (Google Fonts)             -> teks isi & fungsional
    ========================================================= */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Public+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Margarine&family=Poppins:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Upakarti';
+  src: url('../fonts/Upakarti.ttf') format('truetype'),
+       url('../fonts/upakarti.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --wood-950: #241609;
@@ -36,12 +45,12 @@
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: 'Public Sans', system-ui, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
   background: var(--canvas);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
-h1,h2,h3,h4 { font-family: 'Fraunces', Georgia, serif; color: var(--wood-900); margin: 0 0 6px; font-weight: 700; letter-spacing: -0.01em; }
+h1,h2,h3,h4 { font-family: 'Margarine', 'Poppins', sans-serif; color: var(--wood-900); margin: 0 0 6px; font-weight: 400; letter-spacing: 0.01em; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; transition: background .15s ease, transform .1s ease, opacity .15s ease; }
 button:active { transform: scale(0.98); }
@@ -70,12 +79,20 @@ input, select, textarea { font-family: inherit; }
 }
 .topbar-row { display: flex; align-items: center; gap: 10px; }
 .topbar .wordmark {
-  font-family: 'Fraunces', serif;
-  font-weight: 700;
+  font-family: 'Margarine', 'Poppins', sans-serif;
+  font-weight: 400;
   font-size: 1.3rem;
   color: var(--gold-300);
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   flex: 1;
+}
+/* Judul ASMOROBANGUN di beranda: aksara nuansa Jawa (Upakarti) */
+.topbar .wordmark.brand {
+  font-family: 'Upakarti', 'Margarine', serif;
+  font-size: 1.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.1;
 }
 .topbar .icon-btn {
   width: 38px; height: 38px; border-radius: 50%;
@@ -225,6 +242,7 @@ input, select, textarea { font-family: inherit; }
   padding: 11px 13px; font-size: 0.92rem; font-family: inherit; background: #fff; color: var(--ink);
 }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--wood-700); box-shadow: 0 0 0 3px rgba(85,52,30,0.1); }
+.field input[type=radio], .field input[type=checkbox] { width: auto; padding: 0; border: none; box-shadow: none; }
 .field-hint { font-size: 0.74rem; color: var(--ink-soft); margin-top: 5px; }
 .pill-choice { display: flex; gap: 8px; flex-wrap: wrap; }
 .pill-choice label {
@@ -246,7 +264,8 @@ input, select, textarea { font-family: inherit; }
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; font-size: 0.66rem; color: var(--ink-soft); font-weight: 700;
 }
-.bottom-nav a .nav-icon { font-size: 1.3rem; }
+.bottom-nav a .nav-icon { display: flex; }
+.bottom-nav a .nav-icon .ic { width: 24px; height: 24px; }
 .bottom-nav a.active { color: var(--wood-800); }
 .bottom-nav a.active .nav-icon { color: var(--gold-400); }
 
@@ -310,7 +329,6 @@ input, select, textarea { font-family: inherit; }
 .transfer-box { background: var(--cream-200); border-radius: var(--radius-m); padding: 16px; margin-top: 10px; }
 .transfer-box .tb-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.87rem; border-bottom: 1px dashed var(--line); }
 .transfer-box .tb-row:last-child { border-bottom: none; }
-.phone-verify-box { background: var(--cream-200); border-radius: var(--radius-m); padding: 14px; margin-top: 8px; }
 .pay-done { display: flex; gap: 10px; align-items: center; }
 .pay-done-icon { font-size: 1.6rem; }
 
@@ -319,14 +337,15 @@ input, select, textarea { font-family: inherit; }
   height: 200px; background: linear-gradient(155deg, var(--wood-950), var(--wood-700));
   display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--cream-100);
 }
-.auth-hero .wordmark { font-family:'Fraunces',serif; font-size:1.55rem; color: var(--gold-300); font-weight:700; }
+.auth-hero .wordmark { font-family:'Upakarti','Margarine',serif; font-size:1.9rem; color: var(--gold-300); font-weight:400; letter-spacing:0.08em; text-transform:uppercase; }
 .auth-hero .tagline { font-size: 0.8rem; color: var(--cream-200); margin-top: 5px; text-align: center; padding: 0 24px; }
 .auth-body { padding: 24px 20px; }
 .auth-switch { text-align: center; font-size: 0.85rem; margin-top: 10px; color: var(--ink-soft); }
 .auth-switch a { color: var(--wood-800); font-weight: 700; }
 
 .empty-state { text-align: center; padding: 44px 20px; color: var(--ink-soft); }
-.empty-state .e-icon { font-size: 2.1rem; margin-bottom: 10px; }
+.empty-state .e-icon { font-size: 2.1rem; margin-bottom: 10px; color: var(--wood-600); }
+.empty-state .e-icon .ic { width: 1.2em; height: 1.2em; }
 
 .toast {
   position: fixed; left: 50%; bottom: calc(var(--nav-h) + 20px); transform: translateX(-50%);
@@ -369,3 +388,27 @@ input, select, textarea { font-family: inherit; }
   .hcard { flex: 0 0 30%; }
   .news-card { flex: 0 0 31%; }
 }
+
+/* ---------- Ikon SVG (Material Design Icons) ---------- */
+.ic { width: 1.2em; height: 1.2em; flex-shrink: 0; vertical-align: -0.24em; }
+.btn .ic { vertical-align: 0; }
+.topbar .icon-btn .ic, .icon-btn .ic { width: 20px; height: 20px; vertical-align: 0; }
+.back-row .back-btn .ic { width: 20px; height: 20px; vertical-align: 0; }
+.back-row .back-btn, .topbar .icon-btn, .lb-close { line-height: 0; }
+.stars .ic { width: 1em; height: 1em; vertical-align: -0.15em; margin-right: 1px; }
+.menu-row .m-icon, .tile .t-icon { line-height: 0; }
+.tile .t-icon { color: var(--wood-700); margin-bottom: 2px; }
+.tile .t-icon .ic { width: 28px; height: 28px; }
+.menu-row .m-icon .ic { width: 26px; height: 26px; }
+.quick-grid .qi .ic { width: 26px; height: 26px; }
+.ai-fab .ic { width: 28px; height: 28px; }
+.pay-done-icon { color: var(--ok); line-height: 0; }
+.pay-done-icon .ic { width: 32px; height: 32px; }
+.pay-method-label { display: inline-flex; align-items: center; gap: 6px; }
+.status-chip .ic { width: 1.1em; height: 1.1em; vertical-align: -0.2em; margin-right: 3px; }
+.new-thread-fab .ic { width: 18px; height: 18px; vertical-align: 0; }
+.price-note { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--wood-900); }
+.price-note .ic { color: var(--wood-700); }
+.pay-info-note { font-size: 0.82rem; color: var(--ink-soft); margin: 10px 0 12px; }
+.pay-cash-box { background: var(--cream-200); border-radius: var(--radius-m); padding: 16px; margin-top: 10px; }
+.pay-cash-box p { margin: 0 0 12px; font-size: 0.86rem; }

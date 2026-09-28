@@ -10,16 +10,6 @@ const uploadProof = makeUploader("payment_proof");
 
 const VALID_PAYMENT_METHODS = ["qris", "transfer", "cash"];
 
-function requirePhoneVerified(req, res) {
-  const db = readDB();
-  const user = db.users.find((u) => u.id === req.user.id);
-  if (!user || !user.phoneVerified) {
-    res.status(403).json({ error: "Verifikasi nomor HP dulu sebelum melihat detail pembayaran ini.", needsPhoneVerification: true });
-    return false;
-  }
-  return true;
-}
-
 // POST /api/bookings  -- create a booking / event request (requires login, per revision #1)
 router.post("/", requireAuth, async (req, res) => {
   const { facilityId, date, notes, paymentMethod, eventType, location, guestCount, amount } = req.body;
@@ -62,7 +52,6 @@ router.post("/", requireAuth, async (req, res) => {
 
 // GET /api/bookings/:id/qris -> QRIS milik fasilitas (gambar unggahan admin) atau QR simulasi
 router.get("/:id/qris", requireAuth, async (req, res) => {
-  if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
   const booking = db.bookings.find((b) => b.id === req.params.id);
   if (!booking) return res.status(404).json({ error: "Booking tidak ditemukan." });
@@ -75,6 +64,9 @@ router.get("/:id/qris", requireAuth, async (req, res) => {
   if (cfg && cfg.image) {
     return res.json({ qris: cfg.image, amount: booking.amount, note: "Scan QRIS sanggar, lalu unggah bukti pembayaran." });
   }
+  if (db.paymentSettings.qrisImage) {
+    return res.json({ qris: db.paymentSettings.qrisImage, amount: booking.amount, note: "Scan QRIS sanggar, lalu unggah bukti pembayaran." });
+  }
   const payload = `ASMOROBANGUN|BOOKING:${booking.id}|NOMINAL:${booking.amount || 0}|${db.paymentSettings.qrisMerchantName}`;
   try {
     const dataUrl = await QRCode.toDataURL(payload, { margin: 1, width: 320 });
@@ -86,7 +78,6 @@ router.get("/:id/qris", requireAuth, async (req, res) => {
 
 // GET /api/bookings/:id/transfer -> catatan transfer milik fasilitas (jika diisi) atau rekening global
 router.get("/:id/transfer", requireAuth, (req, res) => {
-  if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
   const booking = db.bookings.find((b) => b.id === req.params.id);
   if (!booking) return res.status(404).json({ error: "Booking tidak ditemukan." });
@@ -116,6 +107,24 @@ router.post("/:id/proof", requireAuth, uploadProof.single("proof"), async (req, 
     b.status = "menunggu_verifikasi";
   });
   res.json({ message: "Bukti pembayaran berhasil diunggah, menunggu verifikasi admin.", proofFile: fileUrl });
+});
+
+// POST /api/bookings/:id/cash -- pilih bayar tunai di lokasi (tanpa bukti pembayaran)
+router.post("/:id/cash", requireAuth, async (req, res) => {
+  const db = readDB();
+  const booking = db.bookings.find((b) => b.id === req.params.id);
+  if (!booking) return res.status(404).json({ error: "Booking tidak ditemukan." });
+  if (booking.userId !== req.user.id) return res.status(403).json({ error: "Tidak diizinkan." });
+  if (booking.proofFile) return res.status(400).json({ error: "Bukti pembayaran sudah diunggah untuk booking ini." });
+  const facility = db.facilities.find((f) => f.id === booking.facilityId);
+  const cfg = facility && facility.paymentMethods && facility.paymentMethods.cash;
+  if (cfg && cfg.enabled === false) return res.status(400).json({ error: "Pembayaran tunai tidak tersedia untuk layanan ini." });
+  await update((data) => {
+    const b = data.bookings.find((x) => x.id === req.params.id);
+    b.paymentMethod = "cash";
+    b.status = "menunggu_kedatangan";
+  });
+  res.json({ message: "Pembayaran tunai dicatat. Silakan bayar langsung di lokasi.", status: "menunggu_kedatangan" });
 });
 
 // GET /api/bookings/mine

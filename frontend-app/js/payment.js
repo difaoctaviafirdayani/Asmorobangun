@@ -1,5 +1,11 @@
 import { api, showToast, formatRupiah, fileUrl, escapeHtml } from "./api.js";
+import { icon } from "./icons.js";
 
+// Alur pembayaran (sama untuk booking layanan & pesanan topeng):
+//   QRIS          -> langsung tampil gambar QRIS, lalu unggah bukti pembayaran
+//   Transfer Bank -> langsung tampil nomor rekening, lalu unggah bukti pembayaran
+//   Tunai         -> cukup pilih "Bayar Tunai", tanpa bukti pembayaran & tanpa verifikasi apa pun
+//
 // kind: "booking" | "topeng"
 // methods: pengaturan metode pembayaran dari admin (facility.paymentMethods), boleh kosong
 export function renderPaymentBlock({ kind, id, amount, existingProof, existingMethod, methods = {} }) {
@@ -10,25 +16,48 @@ export function renderPaymentBlock({ kind, id, amount, existingProof, existingMe
     return `
       <div class="card card-pad payment-box" id="${wrapId}">
         <div class="pay-done">
-          <div class="pay-done-icon">✅</div>
+          <div class="pay-done-icon">${icon("check")}</div>
           <div>
             <strong>Bukti pembayaran terkirim</strong>
-            <div class="field-hint">Metode: ${existingMethod || "-"} · Menunggu verifikasi admin.</div>
+            <div class="field-hint">Metode: ${methodLabel(existingMethod)} · Menunggu verifikasi admin.</div>
           </div>
         </div>
         <a href="${fileUrl(existingProof)}" target="_blank" class="btn btn-outline btn-sm" style="margin-top:10px">Lihat bukti yang diunggah</a>
       </div>`;
   }
 
+  if (existingMethod === "cash") {
+    setTimeout(() => wireChangeMethod({ id, amount, base, wrapId, methods }), 0);
+    return `
+      <div class="card card-pad payment-box" id="${wrapId}">
+        <div class="pay-done">
+          <div class="pay-done-icon">${icon("cash")}</div>
+          <div>
+            <strong>Pembayaran tunai dicatat</strong>
+            <div class="field-hint">Silakan bayar langsung di lokasi. Tidak perlu unggah bukti pembayaran.</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="${wrapId}-change" style="margin-top:10px">Ganti metode pembayaran</button>
+      </div>`;
+  }
+
+  return pickerHtml({ id, amount, base, wrapId, methods });
+}
+
+function methodLabel(m) {
+  return { qris: "QRIS", transfer: "Transfer Bank", cash: "Tunai" }[m] || "-";
+}
+
+function pickerHtml({ id, amount, base, wrapId, methods }) {
   const isOn = (m) => !methods[m] || methods[m].enabled !== false;
   const all = [
-    { key: "qris", label: "📷 QRIS" },
-    { key: "transfer", label: "🏦 Transfer Bank" },
-    { key: "cash", label: "💵 Tunai" },
+    { key: "qris", label: "QRIS", ic: "qr" },
+    { key: "transfer", label: "Transfer Bank", ic: "bank" },
+    { key: "cash", label: "Tunai", ic: "cash" },
   ].filter((m) => isOn(m.key));
 
   if (!all.length) {
-    return `<div class="card card-pad payment-box"><div class="empty-state">Belum ada metode pembayaran yang aktif. Silakan hubungi admin sanggar.</div></div>`;
+    return `<div class="card card-pad payment-box" id="${wrapId}"><div class="empty-state">Belum ada metode pembayaran yang aktif. Silakan hubungi admin sanggar.</div></div>`;
   }
 
   setTimeout(() => initPaymentBlock({ id, amount, base, wrapId, methods }), 0);
@@ -41,7 +70,7 @@ export function renderPaymentBlock({ kind, id, amount, existingProof, existingMe
           ${all
             .map(
               (m, i) =>
-                `<label><input type="radio" name="pm-${wrapId}" value="${m.key}" ${i === 0 ? "checked" : ""} /><span>${m.label}</span></label>`
+                `<label><input type="radio" name="pm-${wrapId}" value="${m.key}" ${i === 0 ? "checked" : ""} /><span class="pay-method-label">${icon(m.ic)} ${m.label}</span></label>`
             )
             .join("")}
         </div>
@@ -50,56 +79,58 @@ export function renderPaymentBlock({ kind, id, amount, existingProof, existingMe
     </div>`;
 }
 
+// Dari keadaan "tunai sudah dipilih" kembali ke pilihan metode
+function wireChangeMethod({ id, amount, base, wrapId, methods }) {
+  const btn = document.getElementById(`${wrapId}-change`);
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const wrap = document.getElementById(wrapId);
+    if (wrap) wrap.outerHTML = pickerHtml({ id, amount, base, wrapId, methods });
+  });
+}
+
 async function initPaymentBlock({ id, amount, base, wrapId, methods }) {
   const wrap = document.getElementById(wrapId);
   if (!wrap) return;
+  let token = 0; // supaya balasan lama tidak menimpa pilihan metode yang lebih baru
   wrap.querySelectorAll(`input[name="pm-${wrapId}"]`).forEach((r) => r.addEventListener("change", () => renderMethodArea()));
   renderMethodArea();
 
   async function renderMethodArea() {
+    const my = ++token;
     const method = wrap.querySelector(`input[name="pm-${wrapId}"]:checked`).value;
     const area = document.getElementById(`${wrapId}-area`);
+    if (!area) return;
 
     if (method === "cash") {
       const note = methods.cash && methods.cash.note ? `<strong>Catatan:</strong> ${escapeHtml(methods.cash.note)}<br/>` : "";
       area.innerHTML = `
-        <div class="field-hint" style="margin:8px 0 12px">${note}Bayar tunai langsung di lokasi. Kamu tetap bisa unggah foto bukti (mis. kuitansi) di bawah ini — opsional.</div>
-        ${proofUploadHtml(wrapId, false)}`;
-      wireProofUpload({ wrapId, base, method });
+        <div class="pay-cash-box">
+          <p>${note}Bayar tunai langsung di lokasi sanggar. Tidak perlu unggah bukti pembayaran.</p>
+          <button class="btn btn-primary" id="${wrapId}-cash-btn">Pilih Bayar Tunai</button>
+        </div>`;
+      wireCash({ wrapId, base });
       return;
     }
 
-    // QRIS / transfer wajib verifikasi nomor HP dulu
-    let status;
-    try {
-      status = await api("/payments/settings", { auth: true });
-    } catch (err) {
-      area.innerHTML = `<div class="empty-state">Gagal memuat info pembayaran.</div>`;
-      return;
-    }
-
-    if (!status.phoneVerified) {
-      area.innerHTML = phoneVerifyHtml(wrapId, status.verifiedPhone);
-      wirePhoneVerify(wrapId, renderMethodArea);
-      return;
-    }
+    area.innerHTML = `<div class="qr-box" style="margin-top:10px">${method === "qris" ? "Memuat QRIS..." : "Memuat info rekening..."}</div>`;
 
     if (method === "qris") {
-      area.innerHTML = `<div class="qr-box" style="margin-top:10px">Memuat QRIS...</div>`;
       try {
         const { qris, amount: amt } = await api(`${base}/qris`, { auth: true });
+        if (my !== token) return;
         const src = qris.startsWith("/uploads") ? fileUrl(qris) : qris;
         area.innerHTML = `
-          <div class="qr-box"><img src="${src}"/>${amt ? `<div style="font-weight:700">${formatRupiah(amt)}</div>` : ""}<div class="field-hint">Scan dengan aplikasi e-wallet/mobile banking apapun, lalu unggah bukti pembayaran.</div></div>
-          ${proofUploadHtml(wrapId, true)}`;
+          <div class="qr-box"><img src="${src}" alt="QRIS pembayaran"/>${amt ? `<div style="font-weight:700">${formatRupiah(amt)}</div>` : ""}<div class="field-hint">Scan dengan aplikasi e-wallet/mobile banking apa pun, lalu unggah bukti pembayaran.</div></div>
+          ${proofUploadHtml(wrapId)}`;
         wireProofUpload({ wrapId, base, method });
       } catch (err) {
-        area.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
+        if (my === token) area.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
       }
     } else if (method === "transfer") {
-      area.innerHTML = `<div class="qr-box" style="margin-top:10px">Memuat info rekening...</div>`;
       try {
         const { bank, amount: amt, note } = await api(`${base}/transfer`, { auth: true });
+        if (my !== token) return;
         const rows = note
           ? `<div class="tb-row"><span>Info transfer</span><strong>${escapeHtml(note)}</strong></div>`
           : `<div class="tb-row"><span>Bank</span><strong>${escapeHtml(bank.bankName)}</strong></div>
@@ -110,68 +141,35 @@ async function initPaymentBlock({ id, amount, base, wrapId, methods }) {
             ${rows}
             ${amt ? `<div class="tb-row"><span>Nominal</span><strong>${formatRupiah(amt)}</strong></div>` : ""}
           </div>
-          ${proofUploadHtml(wrapId, true)}`;
+          ${proofUploadHtml(wrapId)}`;
         wireProofUpload({ wrapId, base, method });
       } catch (err) {
-        area.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
+        if (my === token) area.innerHTML = `<div class="empty-state">${escapeHtml(err.message)}</div>`;
       }
     }
   }
 }
 
-function phoneVerifyHtml(wrapId, existingPhone) {
-  return `
-    <div class="phone-verify-box">
-      <div class="field-hint" style="margin-bottom:10px">🔒 Verifikasi nomor HP kamu dulu untuk melihat detail QRIS/rekening tujuan.</div>
-      <div id="${wrapId}-pv-step1">
-        <div class="field"><label>Nomor WhatsApp</label><input id="${wrapId}-pv-phone" placeholder="08xxxxxxxxxx" value="${existingPhone || ""}" /></div>
-        <button class="btn btn-primary btn-sm" id="${wrapId}-pv-send">Kirim Kode Verifikasi</button>
-      </div>
-      <div id="${wrapId}-pv-step2" style="display:none;margin-top:10px">
-        <div class="field"><label>Kode verifikasi (6 digit)</label><input id="${wrapId}-pv-code" maxlength="6" placeholder="123456" /></div>
-        <button class="btn btn-primary btn-sm" id="${wrapId}-pv-verify">Verifikasi</button>
-        <button class="btn btn-ghost btn-sm" id="${wrapId}-pv-resend" style="margin-left:6px">Kirim ulang</button>
-      </div>
-    </div>`;
-}
-
-function wirePhoneVerify(wrapId, onVerified) {
-  const sendBtn = document.getElementById(`${wrapId}-pv-send`);
-  const resendBtn = document.getElementById(`${wrapId}-pv-resend`);
-  const verifyBtn = document.getElementById(`${wrapId}-pv-verify`);
-
-  async function sendCode() {
-    const phone = document.getElementById(`${wrapId}-pv-phone`).value.trim();
-    if (!phone) return showToast("Isi nomor HP dulu.");
+function wireCash({ wrapId, base }) {
+  const btn = document.getElementById(`${wrapId}-cash-btn`);
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
     try {
-      const res = await api("/payments/phone/send-otp", { method: "POST", auth: true, body: { phone } });
-      document.getElementById(`${wrapId}-pv-step1`).style.display = "none";
-      document.getElementById(`${wrapId}-pv-step2`).style.display = "block";
-      showToast(res.devCode ? `Kode verifikasi (demo): ${res.devCode}` : res.message);
+      await api(`${base}/cash`, { method: "POST", auth: true });
+      showToast("Pembayaran tunai dicatat. Bayar langsung di lokasi ya.");
+      window.dispatchEvent(new CustomEvent("payment:done", { detail: { method: "cash" } }));
     } catch (err) {
-      showToast(err.message);
-    }
-  }
-  sendBtn.addEventListener("click", sendCode);
-  resendBtn.addEventListener("click", sendCode);
-  verifyBtn.addEventListener("click", async () => {
-    const phone = document.getElementById(`${wrapId}-pv-phone`).value.trim();
-    const code = document.getElementById(`${wrapId}-pv-code`).value.trim();
-    if (!code) return showToast("Masukkan kode verifikasi.");
-    try {
-      await api("/payments/phone/verify-otp", { method: "POST", auth: true, body: { phone, code } });
-      showToast("Nomor HP terverifikasi!");
-      onVerified();
-    } catch (err) {
+      btn.disabled = false;
       showToast(err.message);
     }
   });
 }
 
-function proofUploadHtml(wrapId, required) {
+function proofUploadHtml(wrapId) {
   return `
     <div class="field" style="margin-top:12px">
-      <label>Unggah bukti pembayaran ${required ? "" : "(opsional)"}</label>
+      <label>Unggah bukti pembayaran</label>
       <input type="file" id="${wrapId}-proof" accept="image/*,.pdf" />
     </div>
     <button class="btn btn-primary" id="${wrapId}-proof-btn">Unggah Bukti</button>`;
@@ -182,19 +180,17 @@ function wireProofUpload({ wrapId, base, method }) {
   if (!btn) return;
   btn.addEventListener("click", async () => {
     const fileInput = document.getElementById(`${wrapId}-proof`);
-    if (method !== "cash" && !fileInput.files.length) return showToast("Pilih file bukti pembayaran dulu.");
+    if (!fileInput.files.length) return showToast("Pilih file bukti pembayaran dulu.");
     const fd = new FormData();
-    if (fileInput.files.length) fd.append("proof", fileInput.files[0]);
+    fd.append("proof", fileInput.files[0]);
     fd.append("paymentMethod", method);
+    btn.disabled = true;
     try {
-      if (fileInput.files.length) {
-        await api(`${base}/proof`, { method: "POST", auth: true, isForm: true, body: fd });
-        showToast("Bukti pembayaran diunggah!");
-      } else {
-        showToast("Metode tunai dicatat. Bayar langsung di lokasi ya.");
-      }
-      window.dispatchEvent(new CustomEvent("payment:done"));
+      await api(`${base}/proof`, { method: "POST", auth: true, isForm: true, body: fd });
+      showToast("Bukti pembayaran diunggah!");
+      window.dispatchEvent(new CustomEvent("payment:done", { detail: { method } }));
     } catch (err) {
+      btn.disabled = false;
       showToast(err.message);
     }
   });

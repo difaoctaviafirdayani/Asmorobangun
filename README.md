@@ -49,33 +49,35 @@ file explorer / live-server terpisah — keduanya sudah diset untuk memanggil AP
 6. **Dashboard admin responsif**: sidebar jadi drawer/hamburger di HP & tablet sempit, dan
    berubah jadi sidebar tetap begitu layar ≥900px (tablet lanskap/laptop).
 
-## Manajemen gambar (Pustaka Media)
+## Upload foto & file (admin)
 
-Menu admin **Pustaka Media** (`#/pustaka-media`) memungkinkan:
-- Unggah satu gambar, atau
-- Unggah **file `.zip` berisi banyak gambar sekaligus** — server otomatis mengekstrak semua
-  gambar di dalamnya ke pustaka media.
-
-Gambar yang sudah ada di pustaka bisa langsung dipakai di menu Kelola Topeng, Kelola Galeri,
-Kelola Artikel, dan Kelola Pengumuman lewat tombol "Pilih dari Pustaka Media" — jadi kalau
-kalian sering ganti-ganti foto, cukup unggah zip baru lalu pilih ulang di masing-masing item.
-
-> Catatan: beberapa data contoh (seed) di `db.json` masih menunjuk ke nama file gambar lama yang
-> belum ada filenya (peninggalan data awal proyek) — tinggal unggah gambar penggantinya lewat
-> Pustaka Media lalu pilih ulang di masing-masing halaman kelola.
+Tidak ada lagi menu "Pustaka Media". Setiap form di dashboard admin punya tombol **Pilih foto**
+sendiri: pilih file, langsung terunggah ke server (`POST /api/uploads/image`), pratinjau tampil,
+lalu klik **Simpan**. Berlaku untuk Kelola Kelas/Fasilitas (gambar + QRIS), Kelola Topeng,
+Kelola Galeri, Kelola Artikel, Kelola Pengumuman, dan Pengaturan Pembayaran (QRIS umum).
+Komponennya ada di `frontend-admin/js/imageField.js`.
 
 ## Pembayaran (QRIS / Transfer / Tunai)
 
-- Untuk **QRIS** dan **Transfer Bank**, pembeli wajib memverifikasi nomor HP (kirim & masukkan
-  kode OTP) dulu sebelum kode QRIS / nomor rekening ditampilkan. Karena prototipe ini belum
-  terhubung ke gateway SMS sungguhan, kode OTP ditampilkan langsung lewat notifikasi (toast) dan
-  dicatat di log server — tinggal sambungkan ke provider SMS/WhatsApp API sungguhan untuk
-  produksi (lihat `backend/src/routes/payments.routes.js`).
-- Ketiga metode (Tunai, QRIS, Transfer) sama-sama bisa menyertakan **unggah bukti pembayaran**.
-- Info rekening bank & nama merchant QRIS bisa diubah admin di menu **Pengaturan Pembayaran**.
+Tanpa verifikasi nomor HP/OTP. Setelah memilih metode, pembeli langsung melihat:
+
+- **QRIS** : gambar QRIS langsung tampil, lalu wajib unggah bukti pembayaran.
+- **Transfer Bank** : nomor rekening langsung tampil, lalu wajib unggah bukti pembayaran.
+- **Tunai** : cukup tekan "Pilih Bayar Tunai" (`POST .../cash`), tanpa bukti pembayaran.
+
+Metode yang tampil, catatan transfer/tunai, dan gambar QRIS per layanan diatur admin di
+**Kelola Kelas/Fasilitas**. Rekening bank dan QRIS umum (dipakai pesanan topeng) diatur di
+**Pengaturan Pembayaran**.
+
+## Font & ikon
+
+- Judul **ASMOROBANGUN** di beranda memakai **Upakarti** (`frontend-app/fonts/Upakarti.ttf`, file font
+  harus dipasang sendiri). Heading memakai **Margarine**, teks isi memakai **Poppins** (keduanya dimuat
+  dari Google Fonts, jadi perlu internet).
+- Semua emoji diganti ikon SVG (Material Design Icons) lewat `js/icons.js` di masing-masing frontend.
 
 ## Catatan teknis
 
 - Database masih file JSON (`backend/data/db.json`) — cocok untuk prototipe/skripsi, tapi ganti
   ke database sungguhan (PostgreSQL/MySQL/MongoDB) sebelum dipakai produksi banyak pengguna.
-- Dependensi baru: `adm-zip` (ekstrak file .zip di server, dipakai fitur Pustaka Media).
+- `adm-zip` masih tercantum di `package.json` tetapi sudah tidak dipakai (fitur upload .zip dihapus); boleh dicabut dengan `npm uninstall adm-zip`.

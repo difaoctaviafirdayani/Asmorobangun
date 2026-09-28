@@ -1,4 +1,5 @@
 import { api, formatDate, formatRupiah, escapeHtml, assetUrl, showToast, fileUrl } from "../api.js";
+import { icon } from "../icons.js";
 
 const STATUS_OPTIONS = [
   "menunggu_pembayaran",
@@ -95,15 +96,15 @@ function openDetail(id) {
     <h3>${escapeHtml(b.facilityName)}</h3>
     <div class="a-field-hint" style="margin-bottom:12px">${escapeHtml(b.userName)} · ${escapeHtml(b.userEmail)}</div>
     <div style="font-size:0.85rem;line-height:1.8">
-      ${b.date ? `<div>📅 Tanggal: ${formatDate(b.date)}</div>` : ""}
-      ${b.eventType ? `<div>🎪 Jenis acara: ${escapeHtml(b.eventType)}</div>` : ""}
-      ${b.location ? `<div>📍 Lokasi: ${escapeHtml(b.location)}</div>` : ""}
-      ${b.guestCount ? `<div>👥 Jumlah tamu: ${escapeHtml(String(b.guestCount))}</div>` : ""}
-      ${b.notes ? `<div>📝 Catatan: ${escapeHtml(b.notes)}</div>` : ""}
-      ${b.amount ? `<div>💰 Nominal: ${formatRupiah(b.amount)}</div>` : ""}
-      ${b.paymentMethod ? `<div>💳 Metode: ${escapeHtml(b.paymentMethod)}</div>` : ""}
+      ${b.date ? `<div class="a-detail-row">${icon("calendar")} Tanggal: ${formatDate(b.date)}</div>` : ""}
+      ${b.eventType ? `<div class="a-detail-row">${icon("event")} Jenis acara: ${escapeHtml(b.eventType)}</div>` : ""}
+      ${b.location ? `<div class="a-detail-row">${icon("pin")} Lokasi: ${escapeHtml(b.location)}</div>` : ""}
+      ${b.guestCount ? `<div class="a-detail-row">${icon("users")} Jumlah tamu: ${escapeHtml(String(b.guestCount))}</div>` : ""}
+      ${b.notes ? `<div class="a-detail-row">${icon("note")} Catatan: ${escapeHtml(b.notes)}</div>` : ""}
+      ${b.amount ? `<div class="a-detail-row">${icon("money")} Nominal: ${formatRupiah(b.amount)}</div>` : ""}
+      ${b.paymentMethod ? `<div class="a-detail-row">${icon("card")} Metode: ${escapeHtml(b.paymentMethod)}</div>` : ""}
     </div>
-    ${b.proofFile ? `<a href="${fileUrl(b.proofFile)}" target="_blank" class="a-btn a-btn-outline a-btn-sm" style="margin-top:10px">📎 Lihat Bukti Pembayaran</a>` : ""}
+    ${b.proofFile ? `<a href="${fileUrl(b.proofFile)}" target="_blank" class="a-btn a-btn-outline a-btn-sm" style="margin-top:10px">${icon("clip")} Lihat Bukti Pembayaran</a>` : ""}
     <div class="a-field" style="margin-top:16px">
       <label>Ubah status</label>
       <select class="a-select" id="statusSelect" style="width:100%">${STATUS_OPTIONS.map((s) => `<option value="${s}" ${s === b.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}</select>

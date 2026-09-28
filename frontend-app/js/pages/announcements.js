@@ -1,10 +1,11 @@
+import { icon } from "../icons.js";
 import { api, assetUrl, escapeHtml, formatDate } from "../api.js";
 
 async function render(container) {
   container.innerHTML = `
     <div class="topbar">
       <div class="topbar-row">
-        <button class="icon-btn" data-nav="#/">←</button>
+        <button class="icon-btn" data-nav="#/">${icon("back")}</button>
         <div class="wordmark" style="font-size:1.05rem">Berita &amp; Pengumuman</div>
       </div>
     </div>
@@ -29,7 +30,7 @@ async function render(container) {
             </a>`
           )
           .join("")
-      : `<div class="empty-state"><div class="e-icon">📢</div>Belum ada pengumuman.</div>`;
+      : `<div class="empty-state"><div class="e-icon">${icon("announce")}</div>Belum ada pengumuman.</div>`;
   } catch (e) {}
 }
 

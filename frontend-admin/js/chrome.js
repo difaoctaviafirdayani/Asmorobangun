@@ -1,18 +1,18 @@
 import { currentAdmin, clearAdminSession } from "./api.js";
+import { icon } from "./icons.js";
 
 const MENU = [
-  { id: "dashboard", href: "#/dashboard", icon: "📊", label: "Dashboard" },
-  { id: "pendaftar", href: "#/pendaftar", icon: "🧾", label: "Pendaftar & Booking" },
-  { id: "topeng-orders", href: "#/pesanan-topeng", icon: "🪆", label: "Pesanan Topeng" },
-  { id: "kelas", href: "#/kelola-kelas", icon: "🎭", label: "Kelola Kelas/Fasilitas" },
-  { id: "topeng", href: "#/kelola-topeng", icon: "🗿", label: "Kelola Topeng" },
-  { id: "galeri", href: "#/kelola-galeri", icon: "🖼️", label: "Kelola Galeri" },
-  { id: "edukasi", href: "#/kelola-edukasi", icon: "📚", label: "Kelola Edukasi" },
-  { id: "artikel", href: "#/kelola-artikel", icon: "📰", label: "Kelola Artikel" },
-  { id: "pengumuman", href: "#/kelola-pengumuman", icon: "📢", label: "Kelola Pengumuman" },
-  { id: "forum", href: "#/kelola-forum", icon: "💬", label: "Kelola Forum" },
-  { id: "media", href: "#/pustaka-media", icon: "🗂️", label: "Pustaka Media (Gambar)" },
-  { id: "pembayaran", href: "#/pengaturan-pembayaran", icon: "💳", label: "Pengaturan Pembayaran" },
+  { id: "dashboard", href: "#/dashboard", icon: "dashboard", label: "Dashboard" },
+  { id: "pendaftar", href: "#/pendaftar", icon: "receipt", label: "Pendaftar & Booking" },
+  { id: "topeng-orders", href: "#/pesanan-topeng", icon: "topeng", label: "Pesanan Topeng" },
+  { id: "kelas", href: "#/kelola-kelas", icon: "facilities", label: "Kelola Kelas/Fasilitas" },
+  { id: "topeng", href: "#/kelola-topeng", icon: "topeng", label: "Kelola Topeng" },
+  { id: "galeri", href: "#/kelola-galeri", icon: "gallery", label: "Kelola Galeri" },
+  { id: "edukasi", href: "#/kelola-edukasi", icon: "book", label: "Kelola Edukasi" },
+  { id: "artikel", href: "#/kelola-artikel", icon: "article", label: "Kelola Artikel" },
+  { id: "pengumuman", href: "#/kelola-pengumuman", icon: "announce", label: "Kelola Pengumuman" },
+  { id: "forum", href: "#/kelola-forum", icon: "chat", label: "Kelola Forum" },
+  { id: "pembayaran", href: "#/pengaturan-pembayaran", icon: "card", label: "Pengaturan Pembayaran" },
 ];
 
 let built = false;
@@ -32,7 +32,7 @@ export function ensureShell() {
     </aside>
     <div class="a-main">
       <header class="a-topbar">
-        <button class="a-hamburger" id="aHamburger">☰</button>
+        <button class="a-hamburger" id="aHamburger" aria-label="Menu">${icon("menu")}</button>
         <div class="a-topbar-title" id="aPageTitle">Dashboard</div>
       </header>
       <main class="a-content" id="aContent"></main>
@@ -60,9 +60,9 @@ export function paintChrome(activeId, title) {
   ensureShell();
   const admin = currentAdmin();
   document.getElementById("aNav").innerHTML = MENU.map(
-    (m) => `<a href="${m.href}" class="${m.id === activeId ? "active" : ""}" data-close-sidebar><span class="a-nav-icon">${m.icon}</span>${m.label}</a>`
+    (m) => `<a href="${m.href}" class="${m.id === activeId ? "active" : ""}" data-close-sidebar><span class="a-nav-icon">${icon(m.icon)}</span>${m.label}</a>`
   ).join("");
-  document.getElementById("aAdminChip").innerHTML = admin ? `👤 ${admin.name}` : "";
+  document.getElementById("aAdminChip").innerHTML = admin ? `${icon("account")} ${admin.name}` : "";
   document.getElementById("aPageTitle").textContent = title || "";
   document.querySelectorAll("[data-close-sidebar]").forEach((a) => a.addEventListener("click", closeSidebar));
 }

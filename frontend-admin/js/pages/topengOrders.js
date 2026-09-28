@@ -1,4 +1,5 @@
 import { api, formatDate, formatRupiah, escapeHtml, fileUrl, showToast } from "../api.js";
+import { icon } from "../icons.js";
 
 const STATUS_OPTIONS = ["menunggu_konfirmasi_admin", "menunggu_verifikasi", "dikonfirmasi", "diproses", "dikirim", "selesai", "ditolak"];
 const STATUS_LABEL = {
@@ -53,7 +54,7 @@ function paint() {
                 <td>${escapeHtml(o.userName)}<br/><span style="font-size:0.72rem;color:var(--ink-soft)">${escapeHtml(o.buyerPhone || "-")}</span></td>
                 <td>${escapeHtml(o.topengName)} x${o.qty}</td>
                 <td>${formatRupiah(o.total)}</td>
-                <td>${o.customName || o.customDesign ? "✅" : "-"}</td>
+                <td>${o.customName || o.customDesign ? icon("check") : "-"}</td>
                 <td><span class="a-badge ${tone(o.status)}">${STATUS_LABEL[o.status] || o.status}</span></td>
                 <td><button class="a-btn a-btn-outline a-btn-sm" data-detail="${o.id}">Detail</button></td>
               </tr>`
@@ -70,12 +71,12 @@ function openDetail(id) {
   document.getElementById("detailModalBody").innerHTML = `
     <h3>${escapeHtml(o.topengName)} x${o.qty}</h3>
     <div class="a-field-hint" style="margin-bottom:10px">${escapeHtml(o.userName)} · ${escapeHtml(o.buyerPhone || "-")} · ${formatDate(o.createdAt)}</div>
-    ${o.customName ? `<div style="font-size:0.85rem">✏️ Nama custom: <strong>${escapeHtml(o.customName)}</strong></div>` : ""}
-    ${o.customDesign ? `<div style="font-size:0.85rem;margin-top:4px">🎨 Desain custom: ${escapeHtml(o.customDesign)}</div>` : ""}
-    ${o.message ? `<div style="font-size:0.85rem;margin-top:4px">📝 Catatan: ${escapeHtml(o.message)}</div>` : ""}
+    ${o.customName ? `<div style="font-size:0.85rem">${icon("pencil")} Nama custom: <strong>${escapeHtml(o.customName)}</strong></div>` : ""}
+    ${o.customDesign ? `<div style="font-size:0.85rem;margin-top:4px">${icon("palette")} Desain custom: ${escapeHtml(o.customDesign)}</div>` : ""}
+    ${o.message ? `<div style="font-size:0.85rem;margin-top:4px">${icon("note")} Catatan: ${escapeHtml(o.message)}</div>` : ""}
     <div style="font-weight:700;margin-top:8px">Total: ${formatRupiah(o.total)}</div>
-    ${o.paymentMethod ? `<div style="font-size:0.85rem">💳 Metode: ${escapeHtml(o.paymentMethod)}</div>` : ""}
-    ${o.proofFile ? `<a href="${fileUrl(o.proofFile)}" target="_blank" class="a-btn a-btn-outline a-btn-sm" style="margin-top:8px">📎 Lihat Bukti Pembayaran</a>` : ""}
+    ${o.paymentMethod ? `<div style="font-size:0.85rem">${icon("card")} Metode: ${escapeHtml(o.paymentMethod)}</div>` : ""}
+    ${o.proofFile ? `<a href="${fileUrl(o.proofFile)}" target="_blank" class="a-btn a-btn-outline a-btn-sm" style="margin-top:8px">${icon("clip")} Lihat Bukti Pembayaran</a>` : ""}
 
     <div style="margin-top:14px">
       <label style="font-size:0.78rem;font-weight:700;color:var(--wood-900)">Riwayat Chat</label>
