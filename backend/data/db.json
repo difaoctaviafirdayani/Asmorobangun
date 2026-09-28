@@ -181,86 +181,7 @@
       "desc": "Topeng tokoh putri dengan raut wajah anggun dan halus, melambangkan kelembutan serta kesetiaan."
     }
   ],
-  "topengOrders": [
-    {
-      "id": "ord-gcARdseV",
-      "topengId": "tp-panji",
-      "topengName": "Topeng Panji",
-      "topengImage": "topeng-panji.jpg",
-      "userId": "u-1jjZufHd",
-      "userName": "difa octavia",
-      "buyerPhone": "",
-      "qty": 1,
-      "unitPrice": "350000",
-      "total": 350000,
-      "customName": null,
-      "customDesign": null,
-      "message": "",
-      "paymentMethod": null,
-      "proofFile": null,
-      "status": "menunggu_konfirmasi_admin",
-      "createdAt": "2026-09-26T14:34:30.061Z",
-      "chatLog": [
-        {
-          "from": "system",
-          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
-          "date": "2026-09-26T14:34:30.061Z"
-        }
-      ]
-    },
-    {
-      "id": "ord-N7rkI9HU",
-      "topengId": "tp-panji",
-      "topengName": "Topeng Panji",
-      "topengImage": "topeng-panji.jpg",
-      "userId": "u-1jjZufHd",
-      "userName": "difa octavia",
-      "buyerPhone": "",
-      "qty": 1,
-      "unitPrice": "350000",
-      "total": 350000,
-      "customName": null,
-      "customDesign": null,
-      "message": "",
-      "paymentMethod": null,
-      "proofFile": null,
-      "status": "menunggu_konfirmasi_admin",
-      "createdAt": "2026-09-26T14:44:34.199Z",
-      "chatLog": [
-        {
-          "from": "system",
-          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
-          "date": "2026-09-26T14:44:34.199Z"
-        }
-      ]
-    },
-    {
-      "id": "ord-7Yc6oksA",
-      "topengId": "tp-panji",
-      "topengName": "Topeng Panji",
-      "topengImage": "topeng-panji.jpg",
-      "userId": "u-1jjZufHd",
-      "userName": "difa octavia",
-      "buyerPhone": "082231313237",
-      "qty": 1,
-      "unitPrice": "350000",
-      "total": 350000,
-      "customName": null,
-      "customDesign": null,
-      "message": "",
-      "paymentMethod": null,
-      "proofFile": null,
-      "status": "menunggu_konfirmasi_admin",
-      "createdAt": "2026-09-28T12:21:59.682Z",
-      "chatLog": [
-        {
-          "from": "system",
-          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
-          "date": "2026-09-28T12:21:59.683Z"
-        }
-      ]
-    }
-  ],
+  "topengOrders": [],
   "articles": [
     {
       "id": "art-1",
@@ -356,7 +277,7 @@
       "id": "gal-3",
       "title": "Gebyak Senen Legian",
       "caption": "Pementasan rutin setiap Senin Legi di padepokan",
-      "image": "/uploads/site_images/1790433189849-6fJveEBM.jpeg",
+      "image": "gallery-3.jpg",
       "date": "2026-02-02T00:00:00.000Z"
     }
   ],

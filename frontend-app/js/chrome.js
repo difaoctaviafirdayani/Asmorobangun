@@ -126,6 +126,7 @@ export function topbar({ title, back, search, cart } = {}) {
     <div class="topbar">
       <div class="topbar-row">
         <div class="wordmark">asmorobangun</div>
+        ${search ? `<button class="icon-btn" data-open-search>🔍</button>` : ""}
         ${cart ? `<a class="icon-btn" href="#/my-orders">🧾</a>` : ""}
       </div>
       ${search === "bar" ? `<div class="search-bar" data-open-search><span></span><input readonly placeholder="Cari artikel, kelas, topeng, forum..." /></div>` : ""}

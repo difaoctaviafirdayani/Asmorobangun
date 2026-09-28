@@ -44,7 +44,7 @@ function ruleBasedAnswer(message) {
   if (/(halo|hai|hi|pagi|siang|sore|malam)/.test(m) && m.length < 20) {
     return "Halo! Aku Asisten Topeng 🎭 — siap bantu jawab apapun soal Topeng Malangan: sejarah, tokoh, bahan, cara merawat, sampai katalog topeng yang dijual di sini. Mau tanya apa?";
   }
-  if (/(beli|pesan|pesen|order|harga|katalog)/.test(m)) {
+  if (/(beli|pesan|order|harga|katalog).*(topeng)?/.test(m) || /topeng.*(beli|pesan|harga)/.test(m)) {
     return `Katalog topeng yang tersedia saat ini:\n${catalogSummary(db)}\n\nKamu juga bisa request nama/desain custom saat memesan lewat tombol "Pesan" di halaman ini.`;
   }
   if (/(rawat|simpan|jamur|rayap|retak|bersih)/.test(m)) {
@@ -62,7 +62,7 @@ function ruleBasedAnswer(message) {
   if (/(warna|makna warna)/.test(m)) {
     return "Warna pada topeng Malangan punya makna watak: putih/krem untuk tokoh halus & bijaksana, merah untuk watak keras/berani/pemarah, hitam untuk watak berwibawa/tegas, dan emas/kuning untuk tokoh bangsawan.";
   }
-  if (/(custom|kustom|kustem|desain sendiri|request nama)/.test(m)) {
+  if (/(custom|desain sendiri|request nama)/.test(m)) {
     return "Bisa banget! Saat memesan, centang opsi 'request nama/desain custom', lalu jelaskan warna, karakter, atau detail ukiran yang kamu inginkan. Admin sanggar akan lanjut diskusi detailnya lewat chat pesanan.";
   }
   return "Aku bisa bantu jawab apapun soal Topeng Malangan — sejarah, tokoh & wataknya, bahan & proses pembuatan, cara merawat, sampai katalog yang dijual di sini. Coba tanya lebih spesifik ya!";
@@ -73,35 +73,32 @@ router.post("/chat", async (req, res) => {
   if (!message) return res.status(400).json({ error: "Pesan tidak boleh kosong." });
 
   const db = readDB();
-  const apiKey = process.env.AI_API_KEY;
-  const baseUrl = process.env.AI_BASE_URL || "https://api.openai.com/v1";
-  const model = process.env.AI_MODEL || "gpt-4o-mini";
-
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return res.json({ reply: ruleBasedAnswer(message), mode: "rule-based" });
   }
 
   try {
-    const messages = [
-      { role: "system", content: `${SYSTEM_CONTEXT}\n\nData katalog topeng saat ini:\n${catalogSummary(db)}` },
-      ...(Array.isArray(history) ? history : []),
-      { role: "user", content: message },
-    ];
-
-    const response = await fetch(`${baseUrl}/chat/completions`, {
+    const messages = [...(Array.isArray(history) ? history : []), { role: "user", content: message }];
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
       },
-      body: JSON.stringify({ model, messages, max_tokens: 500 }),
+      body: JSON.stringify({
+        model: "claude-sonnet-5",
+        max_tokens: 500,
+        system: `${SYSTEM_CONTEXT}\n\nData katalog topeng saat ini:\n${catalogSummary(db)}`,
+        messages,
+      }),
     });
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content?.trim();
-    if (!text) throw new Error(JSON.stringify(data));
-    res.json({ reply: text, mode: "openai-compatible" });
+    const text = (data.content || []).map((b) => b.text || "").join("\n").trim();
+    if (!text) throw new Error("empty response");
+    res.json({ reply: text, mode: "claude-api" });
   } catch (err) {
-    console.error("AI error:", err.message);
     res.json({ reply: ruleBasedAnswer(message), mode: "rule-based-fallback" });
   }
 });
