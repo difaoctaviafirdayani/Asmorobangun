@@ -1,10 +1,8 @@
 import { api, showToast, formatRupiah, fileUrl, escapeHtml } from "./api.js";
 
-// kind: "booking" | "topeng"  (decides which endpoints to call)
-// id: booking id or topeng order id
-// amount: nominal to display
-// existingProof / existingMethod: if already paid, just show the receipt
-export function renderPaymentBlock({ kind, id, amount, existingProof, existingMethod }) {
+// kind: "booking" | "topeng"
+// methods: pengaturan metode pembayaran dari admin (facility.paymentMethods), boleh kosong
+export function renderPaymentBlock({ kind, id, amount, existingProof, existingMethod, methods = {} }) {
   const base = kind === "topeng" ? `/topeng/orders/${id}` : `/bookings/${id}`;
   const wrapId = `pay-${kind}-${id}`;
 
@@ -22,41 +20,56 @@ export function renderPaymentBlock({ kind, id, amount, existingProof, existingMe
       </div>`;
   }
 
-  setTimeout(() => initPaymentBlock({ kind, id, amount, base, wrapId }), 0);
+  const isOn = (m) => !methods[m] || methods[m].enabled !== false;
+  const all = [
+    { key: "qris", label: "📷 QRIS" },
+    { key: "transfer", label: "🏦 Transfer Bank" },
+    { key: "cash", label: "💵 Tunai" },
+  ].filter((m) => isOn(m.key));
+
+  if (!all.length) {
+    return `<div class="card card-pad payment-box"><div class="empty-state">Belum ada metode pembayaran yang aktif. Silakan hubungi admin sanggar.</div></div>`;
+  }
+
+  setTimeout(() => initPaymentBlock({ id, amount, base, wrapId, methods }), 0);
 
   return `
     <div class="card card-pad payment-box" id="${wrapId}">
       <div class="field">
         <label>Pilih metode pembayaran</label>
         <div class="pill-choice pay-methods">
-          <label><input type="radio" name="pm-${wrapId}" value="qris" checked /><span>📷 QRIS</span></label>
-          <label><input type="radio" name="pm-${wrapId}" value="transfer" /><span>🏦 Transfer Bank</span></label>
-          <label><input type="radio" name="pm-${wrapId}" value="cash" /><span>💵 Tunai</span></label>
+          ${all
+            .map(
+              (m, i) =>
+                `<label><input type="radio" name="pm-${wrapId}" value="${m.key}" ${i === 0 ? "checked" : ""} /><span>${m.label}</span></label>`
+            )
+            .join("")}
         </div>
       </div>
       <div id="${wrapId}-area"></div>
     </div>`;
 }
 
-async function initPaymentBlock({ kind, id, amount, base, wrapId }) {
+async function initPaymentBlock({ id, amount, base, wrapId, methods }) {
   const wrap = document.getElementById(wrapId);
   if (!wrap) return;
-  const radios = wrap.querySelectorAll(`input[name="pm-${wrapId}"]`);
-  radios.forEach((r) => r.addEventListener("change", () => renderMethodArea()));
+  wrap.querySelectorAll(`input[name="pm-${wrapId}"]`).forEach((r) => r.addEventListener("change", () => renderMethodArea()));
   renderMethodArea();
 
   async function renderMethodArea() {
     const method = wrap.querySelector(`input[name="pm-${wrapId}"]:checked`).value;
     const area = document.getElementById(`${wrapId}-area`);
+
     if (method === "cash") {
+      const note = methods.cash && methods.cash.note ? `<strong>Catatan:</strong> ${escapeHtml(methods.cash.note)}<br/>` : "";
       area.innerHTML = `
-        <div class="field-hint" style="margin:8px 0 12px">Bayar tunai langsung di lokasi / saat topeng diambil-diantar. Kamu tetap bisa unggah foto bukti (mis. kuitansi) di bawah ini — opsional.</div>
+        <div class="field-hint" style="margin:8px 0 12px">${note}Bayar tunai langsung di lokasi. Kamu tetap bisa unggah foto bukti (mis. kuitansi) di bawah ini — opsional.</div>
         ${proofUploadHtml(wrapId, false)}`;
       wireProofUpload({ wrapId, base, method });
       return;
     }
 
-    // QRIS / transfer both require phone verification first
+    // QRIS / transfer wajib verifikasi nomor HP dulu
     let status;
     try {
       status = await api("/payments/settings", { auth: true });
@@ -75,8 +88,9 @@ async function initPaymentBlock({ kind, id, amount, base, wrapId }) {
       area.innerHTML = `<div class="qr-box" style="margin-top:10px">Memuat QRIS...</div>`;
       try {
         const { qris, amount: amt } = await api(`${base}/qris`, { auth: true });
+        const src = qris.startsWith("/uploads") ? fileUrl(qris) : qris;
         area.innerHTML = `
-          <div class="qr-box"><img src="${qris}"/><div style="font-weight:700">${formatRupiah(amt)}</div><div class="field-hint">Scan dengan aplikasi e-wallet/mobile banking apapun. QRIS simulasi untuk keperluan demo.</div></div>
+          <div class="qr-box"><img src="${src}"/>${amt ? `<div style="font-weight:700">${formatRupiah(amt)}</div>` : ""}<div class="field-hint">Scan dengan aplikasi e-wallet/mobile banking apapun, lalu unggah bukti pembayaran.</div></div>
           ${proofUploadHtml(wrapId, true)}`;
         wireProofUpload({ wrapId, base, method });
       } catch (err) {
@@ -85,13 +99,16 @@ async function initPaymentBlock({ kind, id, amount, base, wrapId }) {
     } else if (method === "transfer") {
       area.innerHTML = `<div class="qr-box" style="margin-top:10px">Memuat info rekening...</div>`;
       try {
-        const { bank, amount: amt } = await api(`${base}/transfer`, { auth: true });
+        const { bank, amount: amt, note } = await api(`${base}/transfer`, { auth: true });
+        const rows = note
+          ? `<div class="tb-row"><span>Info transfer</span><strong>${escapeHtml(note)}</strong></div>`
+          : `<div class="tb-row"><span>Bank</span><strong>${escapeHtml(bank.bankName)}</strong></div>
+             <div class="tb-row"><span>No. Rekening</span><strong>${escapeHtml(bank.accountNumber)}</strong></div>
+             <div class="tb-row"><span>Atas Nama</span><strong>${escapeHtml(bank.accountName)}</strong></div>`;
         area.innerHTML = `
           <div class="transfer-box">
-            <div class="tb-row"><span>Bank</span><strong>${escapeHtml(bank.bankName)}</strong></div>
-            <div class="tb-row"><span>No. Rekening</span><strong>${escapeHtml(bank.accountNumber)}</strong></div>
-            <div class="tb-row"><span>Atas Nama</span><strong>${escapeHtml(bank.accountName)}</strong></div>
-            <div class="tb-row"><span>Nominal</span><strong>${formatRupiah(amt)}</strong></div>
+            ${rows}
+            ${amt ? `<div class="tb-row"><span>Nominal</span><strong>${formatRupiah(amt)}</strong></div>` : ""}
           </div>
           ${proofUploadHtml(wrapId, true)}`;
         wireProofUpload({ wrapId, base, method });

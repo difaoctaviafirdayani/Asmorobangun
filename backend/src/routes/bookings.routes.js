@@ -60,7 +60,7 @@ router.post("/", requireAuth, async (req, res) => {
   res.status(201).json({ booking });
 });
 
-// GET /api/bookings/:id/qris -> returns a QRIS-style QR code (PNG data URL) for a booking
+// GET /api/bookings/:id/qris -> QRIS milik fasilitas (gambar unggahan admin) atau QR simulasi
 router.get("/:id/qris", requireAuth, async (req, res) => {
   if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
@@ -68,6 +68,12 @@ router.get("/:id/qris", requireAuth, async (req, res) => {
   if (!booking) return res.status(404).json({ error: "Booking tidak ditemukan." });
   if (booking.userId !== req.user.id && req.user.role !== "admin") {
     return res.status(403).json({ error: "Tidak diizinkan." });
+  }
+  const facility = db.facilities.find((f) => f.id === booking.facilityId);
+  const cfg = facility && facility.paymentMethods && facility.paymentMethods.qris;
+  if (cfg && cfg.enabled === false) return res.status(400).json({ error: "Metode QRIS tidak tersedia untuk layanan ini." });
+  if (cfg && cfg.image) {
+    return res.json({ qris: cfg.image, amount: booking.amount, note: "Scan QRIS sanggar, lalu unggah bukti pembayaran." });
   }
   const payload = `ASMOROBANGUN|BOOKING:${booking.id}|NOMINAL:${booking.amount || 0}|${db.paymentSettings.qrisMerchantName}`;
   try {
@@ -78,7 +84,7 @@ router.get("/:id/qris", requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/bookings/:id/transfer -> bank account details, only after phone verification
+// GET /api/bookings/:id/transfer -> catatan transfer milik fasilitas (jika diisi) atau rekening global
 router.get("/:id/transfer", requireAuth, (req, res) => {
   if (!requirePhoneVerified(req, res)) return;
   const db = readDB();
@@ -87,7 +93,10 @@ router.get("/:id/transfer", requireAuth, (req, res) => {
   if (booking.userId !== req.user.id && req.user.role !== "admin") {
     return res.status(403).json({ error: "Tidak diizinkan." });
   }
-  res.json({ bank: db.paymentSettings, amount: booking.amount });
+  const facility = db.facilities.find((f) => f.id === booking.facilityId);
+  const cfg = facility && facility.paymentMethods && facility.paymentMethods.transfer;
+  if (cfg && cfg.enabled === false) return res.status(400).json({ error: "Transfer bank tidak tersedia untuk layanan ini." });
+  res.json({ bank: db.paymentSettings, amount: booking.amount, note: (cfg && cfg.note) || "" });
 });
 
 // POST /api/bookings/:id/proof -- upload bukti transfer/qris/tunai (multipart field: proof)
