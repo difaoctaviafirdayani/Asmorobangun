@@ -259,6 +259,58 @@
           "date": "2026-09-28T12:21:59.683Z"
         }
       ]
+    },
+    {
+      "id": "ord-9GfXmJhl",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-28T18:56:52.476Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-28T18:56:52.476Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-msndR28B",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-28T19:04:22.275Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-28T19:04:22.275Z"
+        }
+      ]
     }
   ],
   "articles": [
@@ -356,7 +408,7 @@
       "id": "gal-3",
       "title": "Gebyak Senen Legian",
       "caption": "Pementasan rutin setiap Senin Legi di padepokan",
-      "image": "/uploads/site_images/1790433189849-6fJveEBM.jpeg",
+      "image": "/uploads/site_images/1790622444072-Q5wyjPHQ.jpg",
       "date": "2026-02-02T00:00:00.000Z"
     }
   ],

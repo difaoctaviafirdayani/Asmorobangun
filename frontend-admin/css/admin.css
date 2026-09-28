@@ -113,6 +113,24 @@ input, select, textarea { font-family: inherit; }
 .a-upload { display: flex; gap: 12px; align-items: center; }
 .a-picker-preview { width: 84px; height: 84px; border-radius: 10px; object-fit: cover; border: 1.5px solid var(--line); background: var(--cream-300); }
 
+/* Widget rating bintang (klik untuk ubah) — dipakai di Kelola Ulasan Pendaftar */
+.a-star-input { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.a-star-btn {
+  border: none; background: none; font-size: 1.6rem; line-height: 1; padding: 2px;
+  color: var(--line); cursor: pointer;
+}
+.a-star-btn.on { color: var(--gold-400); }
+.a-star-btn:hover { color: var(--gold-300); }
+
+/* Kelola Ulasan Pendaftar (Kelola Kelas/Fasilitas) */
+.a-review-row { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; background: var(--cream-100); }
+.a-review-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.a-review-comment {
+  width: 100%; border: 1.5px solid var(--line); border-radius: 9px; padding: 9px 11px;
+  font-size: 0.85rem; font-family: inherit; background: #fff; color: var(--ink); resize: vertical;
+}
+.a-review-comment:focus { outline: none; border-color: var(--wood-700); }
+
 .a-modal-overlay { position: fixed; inset: 0; background: rgba(20,13,8,0.55); z-index: 80; display: none; align-items: center; justify-content: center; padding: 16px; }
 .a-modal-overlay.open { display: flex; }
 .a-modal { background: var(--cream-100); border-radius: 16px; padding: 22px; width: 100%; max-width: 460px; max-height: 88vh; overflow-y: auto; }
@@ -152,3 +170,7 @@ input, select, textarea { font-family: inherit; }
 .a-check-label { display: flex !important; gap: 8px; align-items: center; font-weight: 700; margin-bottom: 8px !important; }
 .a-check-label input { width: auto !important; }
 .a-sublabel { font-size: 0.75rem !important; font-weight: 600 !important; }
+
+/* Logo asmorobangun (gambar) */
+.a-logo { height: 30px; width: auto; display: block; margin-bottom: 4px; }
+.a-login-card .a-brand-lg img { height: 56px; width: auto; display: inline-block; }

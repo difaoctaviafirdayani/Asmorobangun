@@ -23,7 +23,7 @@ export function ensureShell() {
   document.getElementById("adminRoot").innerHTML = `
     <div class="a-overlay" id="aOverlay"></div>
     <aside class="a-sidebar" id="aSidebar">
-      <div class="a-brand">asmorobangun<span>admin</span></div>
+     <div class="a-brand"><img class="a-logo" src="assets/logo-gold.png" alt="asmorobangun" /><span>admin</span></div>
       <nav class="a-nav" id="aNav"></nav>
       <div class="a-sidebar-foot">
         <div class="a-admin-chip" id="aAdminChip"></div>

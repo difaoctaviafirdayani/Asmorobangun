@@ -4,7 +4,7 @@ async function render(container) {
   container.innerHTML = `
     <div class="a-login-wrap">
       <div class="a-login-card">
-        <div class="a-brand-lg">asmorobangun</div>
+        <div class="a-brand-lg"><img src="assets/logo-brown.png" alt="asmorobangun" /></div>
         <div class="a-sub">Dashboard Admin Sanggar</div>
         <form id="loginForm">
           <div class="a-field"><label>Email</label><input type="email" id="email" required placeholder="admin@asmorobangun.id" /></div>

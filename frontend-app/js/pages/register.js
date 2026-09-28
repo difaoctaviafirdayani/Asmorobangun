@@ -3,7 +3,7 @@ import { api, setSession, showToast } from "../api.js";
 async function render(container) {
   container.innerHTML = `
     <div class="auth-hero">
-      <div class="wordmark">asmorobangun</div>
+         <img class="brand-logo lg" src="assets/logo-gold.png" alt="asmorobangun" />
       <div class="tagline">Sanggar Wayang Topeng Malangan · Pakisaji</div>
     </div>
     <div class="auth-body">

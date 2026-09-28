@@ -57,4 +57,30 @@ router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
   res.json({ message: "Fasilitas diperbarui." });
 });
 
+// ---- Admin: kelola ulasan pendaftar (edit rating bintang / komentar, atau hapus) ----
+// PATCH /api/facilities/:facilityId/reviews/:reviewId
+router.patch("/:facilityId/reviews/:reviewId", requireAuth, requireAdmin, async (req, res) => {
+  const db = readDB();
+  const review = db.reviews.find((r) => r.id === req.params.reviewId && r.facilityId === req.params.facilityId);
+  if (!review) return res.status(404).json({ error: "Ulasan tidak ditemukan." });
+  const { rating, comment } = req.body;
+  await update((data) => {
+    const r = data.reviews.find((x) => x.id === req.params.reviewId);
+    if (rating !== undefined) r.rating = Math.max(1, Math.min(5, Number(rating)));
+    if (comment !== undefined) r.comment = comment;
+  });
+  res.json({ message: "Ulasan diperbarui." });
+});
+
+// DELETE /api/facilities/:facilityId/reviews/:reviewId
+router.delete("/:facilityId/reviews/:reviewId", requireAuth, requireAdmin, async (req, res) => {
+  const db = readDB();
+  const review = db.reviews.find((r) => r.id === req.params.reviewId && r.facilityId === req.params.facilityId);
+  if (!review) return res.status(404).json({ error: "Ulasan tidak ditemukan." });
+  await update((data) => {
+    data.reviews = data.reviews.filter((r) => r.id !== req.params.reviewId);
+  });
+  res.json({ message: "Ulasan dihapus." });
+});
+
 module.exports = router;

@@ -62,6 +62,15 @@ function renderReviews(reviews) {
     .join("");
 }
 
+// Bintang emas yang bisa diklik untuk mengisi rating (menggantikan dropdown lama)
+function reviewStarButtons(rating) {
+  return [1, 2, 3, 4, 5]
+    .map((n) => `<button type="button" class="rv-star-btn ${n <= rating ? "on" : ""}" data-rv-star="${n}">★</button>`)
+    .join("");
+}
+
+const RATING_LABELS = { 5: "Sangat baik", 4: "Baik", 3: "Cukup", 2: "Kurang", 1: "Buruk" };
+
 function renderReviewForm(fid) {
   const wrap = document.getElementById("reviewForm");
   if (!isLoggedIn()) {
@@ -72,11 +81,25 @@ function renderReviewForm(fid) {
     <div class="card card-pad" style="margin-bottom:14px">
       <div class="field">
         <label>Rating kamu</label>
-        <select id="rvRating"><option value="5">5 - Sangat baik</option><option value="4">4 - Baik</option><option value="3">3 - Cukup</option><option value="2">2 - Kurang</option><option value="1">1 - Buruk</option></select>
+        <div class="rv-star-input" id="rvStarInput">${reviewStarButtons(5)}</div>
+        <div class="field-hint" id="rvRatingLabel">5 - ${RATING_LABELS[5]}</div>
+        <input type="hidden" id="rvRating" value="5" />
       </div>
       <div class="field"><label>Komentar</label><textarea id="rvComment" rows="2" placeholder="Bagikan pengalamanmu..."></textarea></div>
       <button class="btn btn-outline" id="submitReviewBtn">Kirim ulasan</button>
     </div>`;
+
+  document.querySelectorAll("#rvStarInput [data-rv-star]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const val = Number(btn.getAttribute("data-rv-star"));
+      document.getElementById("rvRating").value = val;
+      document.getElementById("rvRatingLabel").textContent = `${val} - ${RATING_LABELS[val]}`;
+      document.querySelectorAll("#rvStarInput [data-rv-star]").forEach((b) => {
+        b.classList.toggle("on", Number(b.getAttribute("data-rv-star")) <= val);
+      });
+    });
+  });
+
   document.getElementById("submitReviewBtn").addEventListener("click", async () => {
     const rating = document.getElementById("rvRating").value;
     const comment = document.getElementById("rvComment").value.trim();

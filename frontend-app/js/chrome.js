@@ -123,10 +123,11 @@ export function topbar({ title, back, search, cart, brand } = {}) {
   if (back) {
     return `<div class="back-row"><button class="back-btn" data-nav="${back}" aria-label="Kembali">${icon("back")}</button>${title ? `<h3 style="margin:0">${title}</h3>` : ""}</div>`;
   }
+  // ← UBAH: judul jadi gambar logo, posisinya di tengah (tombol pesanan tetap di kanan)
   return `
     <div class="topbar">
-      <div class="topbar-row">
-        <div class="wordmark ${brand ? "brand" : ""}">${brand ? "ASMOROBANGUN" : "asmorobangun"}</div>
+      <div class="topbar-row topbar-center">
+        <img class="brand-logo" src="assets/logo-gold.png" alt="asmorobangun" />
         ${cart ? `<a class="icon-btn" href="#/my-orders" aria-label="Pesanan saya">${icon("receipt")}</a>` : ""}
       </div>
       ${search === "bar" ? `<div class="search-bar" data-open-search>${icon("search")}<input readonly placeholder="Cari artikel, kelas, topeng, forum..." /></div>` : ""}

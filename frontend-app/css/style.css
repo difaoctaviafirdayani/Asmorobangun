@@ -2,20 +2,13 @@
    Asmorobangun — Frontend App (user-facing SPA)
    Palet: coklat kayu tua & krem sawo matang, aksen emas tua.
    Font:
-     - Upakarti (lokal, fonts/Upakarti.ttf) -> judul ASMOROBANGUN di beranda
-     - Margarine (Google Fonts)             -> judul/heading
-     - Poppins   (Google Fonts)             -> teks isi & fungsional
+     - Margarine (Google Fonts) -> judul/heading
+     - Poppins   (Google Fonts) -> teks isi & fungsional
+   Judul "asmorobangun" memakai gambar logo (assets/logo-gold.png)
    ========================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Margarine&family=Poppins:wght@400;500;600;700&display=swap');
 
-@font-face {
-  font-family: 'Upakarti';
-  src: url('../fonts/Upakarti.ttf') format('truetype'),
-       url('../fonts/upakarti.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* ← UBAH: blok @font-face Upakarti dihapus */
 
 :root {
   --wood-950: #241609;
@@ -86,14 +79,7 @@ input, select, textarea { font-family: inherit; }
   letter-spacing: 0.3px;
   flex: 1;
 }
-/* Judul ASMOROBANGUN di beranda: aksara nuansa Jawa (Upakarti) */
-.topbar .wordmark.brand {
-  font-family: 'Upakarti', 'Margarine', serif;
-  font-size: 1.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1.1;
-}
+/* ← UBAH: aturan .topbar .wordmark.brand (Upakarti) dihapus */
 .topbar .icon-btn {
   width: 38px; height: 38px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -282,6 +268,15 @@ input, select, textarea { font-family: inherit; }
 .review-item .r-name { font-weight: 700; font-size: 0.85rem; }
 .review-item .r-date { font-size: 0.7rem; color: var(--ink-soft); }
 
+/* Widget bintang klik untuk form ulasan (facilityDetail) */
+.rv-star-input { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.rv-star-btn {
+  border: none; background: none; font-size: 1.9rem; line-height: 1; padding: 2px;
+  color: var(--line); cursor: pointer;
+}
+.rv-star-btn.on { color: var(--gold-400); }
+.rv-star-btn:active { transform: scale(0.92); }
+
 /* Forum */
 .thread-item { padding: 15px 0; border-bottom: 1px solid var(--line); }
 .thread-item .th-cat { font-size: 0.68rem; color: var(--wood-700); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
@@ -337,7 +332,8 @@ input, select, textarea { font-family: inherit; }
   height: 200px; background: linear-gradient(155deg, var(--wood-950), var(--wood-700));
   display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--cream-100);
 }
-.auth-hero .wordmark { font-family:'Upakarti','Margarine',serif; font-size:1.9rem; color: var(--gold-300); font-weight:400; letter-spacing:0.08em; text-transform:uppercase; }
+/* ← UBAH: tidak lagi memakai font Upakarti (judul sekarang gambar logo) */
+.auth-hero .wordmark { font-family:'Margarine','Poppins',sans-serif; font-size:1.9rem; color: var(--gold-300); font-weight:400; letter-spacing:0.02em; }
 .auth-hero .tagline { font-size: 0.8rem; color: var(--cream-200); margin-top: 5px; text-align: center; padding: 0 24px; }
 .auth-body { padding: 24px 20px; }
 .auth-switch { text-align: center; font-size: 0.85rem; margin-top: 10px; color: var(--ink-soft); }
@@ -412,3 +408,12 @@ input, select, textarea { font-family: inherit; }
 .pay-info-note { font-size: 0.82rem; color: var(--ink-soft); margin: 10px 0 12px; }
 .pay-cash-box { background: var(--cream-200); border-radius: var(--radius-m); padding: 16px; margin-top: 10px; }
 .pay-cash-box p { margin: 0 0 12px; font-size: 0.86rem; }
+
+/* ---------- ← UBAH (BARU): Logo asmorobangun (gambar) ---------- */
+.brand-logo { height: 34px; width: auto; max-width: 100%; display: block; }
+.brand-logo.lg { height: 56px; }
+
+/* Judul di tengah, tombol pesanan tetap di kanan */
+.topbar-row.topbar-center { position: relative; justify-content: center; min-height: 38px; }
+.topbar-row.topbar-center .icon-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+.topbar-row.topbar-center .icon-btn + .icon-btn { right: 46px; }
