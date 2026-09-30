@@ -12,7 +12,6 @@ import edukasiPage from "./pages/edukasi.js";
 import artikelPage from "./pages/artikel.js";
 import pengumumanPage from "./pages/pengumuman.js";
 import forumPage from "./pages/forum.js";
-import pembayaranPage from "./pages/pembayaran.js";
 
 const routes = {
   "/login": { page: loginPage, public: true },
@@ -26,7 +25,6 @@ const routes = {
   "/kelola-artikel": { page: artikelPage, nav: "artikel", title: "Kelola Artikel" },
   "/kelola-pengumuman": { page: pengumumanPage, nav: "pengumuman", title: "Kelola Pengumuman" },
   "/kelola-forum": { page: forumPage, nav: "forum", title: "Kelola Forum" },
-  "/pengaturan-pembayaran": { page: pembayaranPage, nav: "pembayaran", title: "Pengaturan Pembayaran" },
 };
 
 function parseHash() {

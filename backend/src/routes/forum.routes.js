@@ -68,6 +68,23 @@ router.post("/:id/replies", requireAuth, async (req, res) => {
   res.status(201).json({ reply });
 });
 
+// PATCH /api/forum/:id (admin) - moderasi judul / kategori / isi diskusi
+router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
+  const db = readDB();
+  if (!db.forumThreads.find((t) => t.id === req.params.id)) return res.status(404).json({ error: "Thread tidak ditemukan." });
+  const { title, content, category } = req.body;
+  if ((title !== undefined && !String(title).trim()) || (content !== undefined && !String(content).trim())) {
+    return res.status(400).json({ error: "Judul dan isi diskusi tidak boleh kosong." });
+  }
+  await update((data) => {
+    const t = data.forumThreads.find((x) => x.id === req.params.id);
+    if (title !== undefined) t.title = title;
+    if (content !== undefined) t.content = content;
+    if (category !== undefined) t.category = category;
+  });
+  res.json({ message: "Diskusi diperbarui." });
+});
+
 router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
   await update((data) => {
     data.forumThreads = data.forumThreads.filter((t) => t.id !== req.params.id);

@@ -21,6 +21,15 @@
       "createdAt": "2026-09-25T06:28:23.657Z",
       "phoneVerified": false,
       "verifiedPhone": null
+    },
+    {
+      "id": "u-klcxsyDX",
+      "name": "dipaa",
+      "email": "difaoctavia26@gmail.com",
+      "phone": "082231313237",
+      "password": "$2a$10$bJvMtpPSsFgY6wmDhv96pOl8H1TMwfOxfxWj8NwX0FUSL9beHAi8a",
+      "role": "member",
+      "createdAt": "2026-09-29T09:07:39.392Z"
     }
   ],
   "facilities": [
@@ -116,18 +125,86 @@
       "rating": 4,
       "comment": "Bagus buat study tour anak sekolah, pemandunya informatif.",
       "date": "2026-02-18T10:00:00.000Z"
-    },
-    {
-      "id": "rv-NecXM7Pa",
-      "facilityId": "panggilan-tari",
-      "userId": "u-1jjZufHd",
-      "userName": "difa octavia",
-      "rating": 4,
-      "comment": "keren banget asli",
-      "date": "2026-09-25T06:36:04.379Z"
     }
   ],
-  "bookings": [],
+  "bookings": [
+    {
+      "id": "bk-wvg9VG8v",
+      "facilityId": "les-tari-reguler",
+      "facilityName": "Les Tari Reguler (Pendaftaran Menetap)",
+      "bookingType": "reguler",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "userEmail": "difaoctaviafirdayani@gmail.com",
+      "date": "sabtu",
+      "notes": "17 tahun",
+      "eventType": null,
+      "location": null,
+      "guestCount": null,
+      "paymentMethod": null,
+      "amount": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T08:49:58.102Z"
+    },
+    {
+      "id": "bk-04GRvIR_",
+      "facilityId": "les-tari-reguler",
+      "facilityName": "Les Tari Reguler (Pendaftaran Menetap)",
+      "bookingType": "reguler",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "userEmail": "difaoctaviafirdayani@gmail.com",
+      "date": "sabtu",
+      "notes": "17 tahun",
+      "eventType": null,
+      "location": null,
+      "guestCount": null,
+      "paymentMethod": null,
+      "amount": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T08:54:52.583Z"
+    },
+    {
+      "id": "bk-B_WCvr9n",
+      "facilityId": "les-tari-reguler",
+      "facilityName": "Les Tari Reguler (Pendaftaran Menetap)",
+      "bookingType": "reguler",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "userEmail": "difaoctaviafirdayani@gmail.com",
+      "date": "sabtu",
+      "notes": "ggg",
+      "eventType": null,
+      "location": null,
+      "guestCount": null,
+      "paymentMethod": null,
+      "amount": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T08:55:33.689Z"
+    },
+    {
+      "id": "bk-l5Pe9iCC",
+      "facilityId": "sewa-kostum",
+      "facilityName": "Sewa Kostum",
+      "bookingType": "rental",
+      "userId": "u-klcxsyDX",
+      "userName": "dipaa",
+      "userEmail": "difaoctavia26@gmail.com",
+      "date": "2026-10-12",
+      "notes": "kostum toppeng",
+      "eventType": null,
+      "location": null,
+      "guestCount": null,
+      "paymentMethod": "qris",
+      "amount": null,
+      "proofFile": null,
+      "status": "menunggu_pembayaran",
+      "createdAt": "2026-09-29T09:21:47.986Z"
+    }
+  ],
   "eventRequests": [],
   "topeng": [
     {
@@ -135,8 +212,8 @@
       "name": "Topeng Panji",
       "character": "Tokoh utama, watak lembut & bijaksana",
       "color": "Putih",
-      "price": "350000",
-      "stock": "5",
+      "price": 350000,
+      "stock": 5,
       "image": "topeng-panji.jpg",
       "desc": "Topeng Panji melambangkan sosok ksatria yang tenang, bijaksana, dan berbudi luhur. Cocok untuk koleksi maupun properti pentas."
     },
@@ -309,6 +386,297 @@
           "from": "system",
           "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
           "date": "2026-09-28T19:04:22.275Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-s5HrrJuM",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T04:03:24.132Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-29T04:03:24.132Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-lIaVvSSq",
+      "topengId": "tp-dewi-sekartaji",
+      "topengName": "Topeng Dewi Sekartaji",
+      "topengImage": "topeng-sekartaji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": 375000,
+      "total": 375000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T04:05:16.544Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Dewi Sekartaji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-29T04:05:16.544Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-g4d-h8FN",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T04:16:16.884Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-29T04:16:16.884Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-6YuorrAS",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T04:33:48.196Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-29T04:33:48.196Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-s5oLruIc",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": "cash",
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-29T08:32:22.893Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-29T08:32:22.893Z"
+        },
+        {
+          "from": "system",
+          "text": "Pembeli memilih pembayaran tunai (bayar langsung di sanggar).",
+          "date": "2026-09-29T08:44:33.859Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-loMenFZS",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": "350000",
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": "qris",
+      "proofFile": "/uploads/payment_proof/1790671529344-Kmv2WkXb.png",
+      "status": "menunggu_verifikasi",
+      "createdAt": "2026-09-29T08:45:12.385Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-29T08:45:12.385Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-L_SM2C47",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": 350000,
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-30T20:22:05.412Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-30T20:22:05.412Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-KqbX3YSL",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": 350000,
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-30T20:22:05.552Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-30T20:22:05.552Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-0AJkDfxP",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": 350000,
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-30T20:22:05.563Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-30T20:22:05.564Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-l-y17__p",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": 350000,
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-30T20:30:23.978Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-30T20:30:23.978Z"
+        }
+      ]
+    },
+    {
+      "id": "ord-L440oURn",
+      "topengId": "tp-panji",
+      "topengName": "Topeng Panji",
+      "topengImage": "topeng-panji.jpg",
+      "userId": "u-1jjZufHd",
+      "userName": "difa octavia",
+      "buyerPhone": "082231313237",
+      "qty": 1,
+      "unitPrice": 350000,
+      "total": 350000,
+      "customName": null,
+      "customDesign": null,
+      "message": "",
+      "paymentMethod": null,
+      "proofFile": null,
+      "status": "menunggu_konfirmasi_admin",
+      "createdAt": "2026-09-30T20:31:02.895Z",
+      "chatLog": [
+        {
+          "from": "system",
+          "text": "Pesanan dibuat untuk Topeng Panji x1. Admin sanggar akan segera merespons di sini.",
+          "date": "2026-09-30T20:31:02.895Z"
         }
       ]
     }

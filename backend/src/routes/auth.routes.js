@@ -1,11 +1,43 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 const { nanoid } = require("nanoid");
 const { readDB, update } = require("../db");
 const { requireAuth, JWT_SECRET } = require("../middleware/auth");
+const { UPLOADS_ROOT, ensureDir } = require("../upload");
 
 const router = express.Router();
+
+// ---------- Upload foto profil ----------
+const AVATAR_DIR = path.join(UPLOADS_ROOT, "avatars");
+ensureDir(AVATAR_DIR);
+
+const uploadAvatar = multer({
+  storage: multer.diskStorage({
+    destination: AVATAR_DIR,
+    filename: (req, file, cb) => {
+      const ext = (path.extname(file.originalname) || ".jpg").toLowerCase();
+      cb(null, `${req.user.id}-${Date.now()}-${nanoid(6)}${ext}`);
+    },
+  }),
+  limits: { fileSize: 3 * 1024 * 1024 }, // 3MB
+  fileFilter: (req, file, cb) => {
+    const okMime = /^image\/(jpeg|png|webp)$/i.test(file.mimetype);
+    const okExt = /\.(jpe?g|png|webp)$/i.test(file.originalname);
+    if (okMime && okExt) cb(null, true);
+    else cb(new Error("Foto profil harus berformat JPG, PNG, atau WEBP."));
+  },
+}).single("avatar");
+
+// Hapus file foto lama (hanya yang memang ada di folder avatars, biar aman)
+function removeOldAvatar(avatarUrl) {
+  if (!avatarUrl || !avatarUrl.startsWith("/uploads/avatars/")) return;
+  const file = path.join(AVATAR_DIR, path.basename(avatarUrl));
+  fs.unlink(file, () => {});
+}
 
 function publicUser(u) {
   const { password, ...rest } = u;
@@ -35,6 +67,7 @@ router.post("/register", async (req, res) => {
     phone: phone || "",
     password: hashed,
     role: "member",
+    avatar: null,
     createdAt: new Date().toISOString(),
   };
   await update((data) => {
@@ -67,6 +100,56 @@ router.get("/me", requireAuth, (req, res) => {
   const user = db.users.find((u) => u.id === req.user.id);
   if (!user) return res.status(404).json({ error: "User tidak ditemukan." });
   res.json({ user: publicUser(user) });
+});
+
+// POST /api/auth/me/avatar  (multipart, field: avatar) -> ganti foto profil
+router.post("/me/avatar", requireAuth, (req, res) => {
+  uploadAvatar(req, res, async (err) => {
+    if (err) {
+      const msg = err.code === "LIMIT_FILE_SIZE" ? "Ukuran foto maksimal 3MB." : err.message;
+      return res.status(400).json({ error: msg });
+    }
+    if (!req.file) return res.status(400).json({ error: "File foto wajib dipilih." });
+
+    const newUrl = `/uploads/avatars/${req.file.filename}`;
+    let oldUrl = null;
+    let found = true;
+    await update((data) => {
+      const u = data.users.find((x) => x.id === req.user.id);
+      if (!u) {
+        found = false;
+        return;
+      }
+      oldUrl = u.avatar;
+      u.avatar = newUrl;
+    });
+    if (!found) {
+      fs.unlink(req.file.path, () => {});
+      return res.status(404).json({ error: "User tidak ditemukan." });
+    }
+    removeOldAvatar(oldUrl);
+    const user = readDB().users.find((x) => x.id === req.user.id);
+    res.json({ message: "Foto profil diperbarui.", user: publicUser(user) });
+  });
+});
+
+// DELETE /api/auth/me/avatar -> hapus foto profil (kembali ke inisial nama)
+router.delete("/me/avatar", requireAuth, async (req, res) => {
+  let oldUrl = null;
+  let found = true;
+  await update((data) => {
+    const u = data.users.find((x) => x.id === req.user.id);
+    if (!u) {
+      found = false;
+      return;
+    }
+    oldUrl = u.avatar;
+    u.avatar = null;
+  });
+  if (!found) return res.status(404).json({ error: "User tidak ditemukan." });
+  removeOldAvatar(oldUrl);
+  const user = readDB().users.find((x) => x.id === req.user.id);
+  res.json({ message: "Foto profil dihapus.", user: publicUser(user) });
 });
 
 module.exports = router;

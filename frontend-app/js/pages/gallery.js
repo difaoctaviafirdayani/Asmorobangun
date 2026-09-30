@@ -3,16 +3,11 @@ import { api, assetUrl, escapeHtml, formatDate } from "../api.js";
 
 async function render(container) {
   container.innerHTML = `
-    <div class="topbar">
-      <div class="topbar-row">
-        <button class="icon-btn" data-nav="#/">${icon("back")}</button>
-        <div class="wordmark" style="font-size:1.05rem">Galeri Sanggar</div>
-      </div>
+    <div class="page-head">
+      <button class="icon-btn" data-nav="#/" aria-label="Kembali">${icon("back")}</button>
+      <h2>Galeri Sanggar</h2>
     </div>
-    <div class="section">
-      <p style="font-size:0.85rem;color:var(--ink-soft)">Dokumentasi kegiatan &amp; pentas sanggar — terbuka untuk siapa saja, tidak perlu masuk akun.</p>
-    </div>
-    <div class="gallery-grid" id="grid"><div class="empty-state">Memuat...</div></div>
+    <div class="gallery-grid g-cards" id="grid"><div class="empty-state">Memuat...</div></div>
 
     <div class="lightbox" id="lightbox">
       <button class="lb-close" id="lbClose" aria-label="Tutup">${icon("close")}</button>
@@ -28,9 +23,10 @@ async function render(container) {
     document.getElementById("grid").innerHTML = items.length
       ? items
           .map(
-            (g, i) => `<div class="g-item" data-idx="${i}">
+            (g, i) => `<div class="g-card" data-idx="${i}">
               <img src="${assetUrl(g.image, "assets/st.jpg")}" onerror="this.src='assets/st.jpg'"/>
-              <div class="g-cap">${escapeHtml(g.title)}</div>
+              <div class="g-title">${escapeHtml(g.title)}</div>
+              ${g.caption ? `<div class="g-text">${escapeHtml(g.caption)}</div>` : ""}
             </div>`
           )
           .join("")

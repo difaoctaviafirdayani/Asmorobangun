@@ -1,5 +1,6 @@
 import { api, formatDate, formatRupiah, escapeHtml, fileUrl, showToast } from "../api.js";
 import { icon } from "../icons.js";
+import { statusField, waLink } from "../ui.js";
 
 const STATUS_OPTIONS = ["menunggu_konfirmasi_admin", "menunggu_verifikasi", "dikonfirmasi", "diproses", "dikirim", "selesai", "ditolak"];
 const STATUS_LABEL = {
@@ -78,21 +79,9 @@ function openDetail(id) {
     ${o.paymentMethod ? `<div style="font-size:0.85rem">${icon("card")} Metode: ${escapeHtml(o.paymentMethod)}</div>` : ""}
     ${o.proofFile ? `<a href="${fileUrl(o.proofFile)}" target="_blank" class="a-btn a-btn-outline a-btn-sm" style="margin-top:8px">${icon("clip")} Lihat Bukti Pembayaran</a>` : ""}
 
-    <div style="margin-top:14px">
-      <label style="font-size:0.78rem;font-weight:700;color:var(--wood-900)">Riwayat Chat</label>
-      <div class="a-chatlog" style="margin-top:6px">
-        ${o.chatLog.map((m) => `<div class="bub ${m.from}">${escapeHtml(m.text)}</div>`).join("")}
-      </div>
-      <div style="display:flex;gap:8px">
-        <input class="a-field" id="adminReply" placeholder="Balas pembeli..." style="flex:1;border:1.5px solid var(--line);border-radius:9px;padding:9px 11px" />
-        <button class="a-btn a-btn-outline a-btn-sm" id="sendReplyBtn">Kirim</button>
-      </div>
-    </div>
+    ${o.buyerPhone ? `<a href="${waLink(o.buyerPhone)}" target="_blank" rel="noopener" class="a-btn a-btn-outline a-btn-sm" style="margin-top:8px">${icon("whatsapp")} Hubungi pembeli via WhatsApp</a>` : ""}
 
-    <div class="a-field" style="margin-top:14px">
-      <label>Ubah status</label>
-      <select class="a-select" id="statusSelect" style="width:100%">${STATUS_OPTIONS.map((s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}</select>
-    </div>
+    <div style="margin-top:14px">${statusField({ options: STATUS_OPTIONS, labels: STATUS_LABEL, current: o.status })}</div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="a-btn a-btn-ghost" id="closeDetail" style="flex:1;justify-content:center">Tutup</button>
       <button class="a-btn a-btn-primary" id="saveStatus" style="flex:1;justify-content:center">Simpan</button>
@@ -100,19 +89,6 @@ function openDetail(id) {
   `;
   modal.classList.add("open");
   document.getElementById("closeDetail").addEventListener("click", () => modal.classList.remove("open"));
-  document.getElementById("sendReplyBtn").addEventListener("click", async () => {
-    const text = document.getElementById("adminReply").value.trim();
-    if (!text) return;
-    try {
-      await api(`/topeng/orders/${id}/message`, { method: "POST", body: { text } });
-      const { order } = await api(`/topeng/orders/${id}`);
-      const idx = allOrders.findIndex((x) => x.id === id);
-      allOrders[idx] = order;
-      openDetail(id);
-    } catch (err) {
-      showToast(err.message);
-    }
-  });
   document.getElementById("saveStatus").addEventListener("click", async () => {
     const status = document.getElementById("statusSelect").value;
     try {

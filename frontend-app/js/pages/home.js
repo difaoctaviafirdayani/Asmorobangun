@@ -1,4 +1,4 @@
-import { api, assetUrl, escapeHtml, formatDateShort } from "../api.js";
+import { api, assetUrl, escapeHtml, formatDateShort, waLink } from "../api.js";
 import { topbar } from "../chrome.js";
 import { icon } from "../icons.js";
 
@@ -42,7 +42,7 @@ async function render(container) {
           src="https://www.openstreetmap.org/export/embed.html?bbox=112.5850%2C-8.0800%2C112.6250%2C-8.0500&layer=mapnik&marker=-8.0656%2C112.6040"></iframe>
         <div style="display:flex;gap:8px;margin-top:12px">
           <a class="btn btn-outline btn-sm" style="flex:1" href="https://www.google.com/maps/search/Sanggar+Asmorobangun+Pakisaji+Malang" target="_blank">Buka di Google Maps</a>
-          <a class="btn btn-primary btn-sm" style="flex:1" href="https://wa.me/6281234567890" target="_blank" rel="noopener">${icon("whatsapp")} WhatsApp Admin</a>
+          <a class="btn btn-primary btn-sm" style="flex:1" href="${waLink()}" target="_blank" rel="noopener">${icon("whatsapp")} WhatsApp Admin</a>
         </div>
       </div>
     </div>

@@ -12,7 +12,6 @@ const MENU = [
   { id: "artikel", href: "#/kelola-artikel", icon: "article", label: "Kelola Artikel" },
   { id: "pengumuman", href: "#/kelola-pengumuman", icon: "announce", label: "Kelola Pengumuman" },
   { id: "forum", href: "#/kelola-forum", icon: "chat", label: "Kelola Forum" },
-  { id: "pembayaran", href: "#/pengaturan-pembayaran", icon: "card", label: "Pengaturan Pembayaran" },
 ];
 
 let built = false;

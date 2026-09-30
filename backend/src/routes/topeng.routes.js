@@ -58,21 +58,6 @@ router.post("/:id/order", requireAuth, async (req, res) => {
   res.status(201).json({ order });
 });
 
-// POST /api/topeng/orders/:orderId/message -- simple in-app chat thread per order
-router.post("/orders/:orderId/message", requireAuth, async (req, res) => {
-  const { text } = req.body;
-  if (!text) return res.status(400).json({ error: "Pesan tidak boleh kosong." });
-  const db = readDB();
-  const order = db.topengOrders.find((o) => o.id === req.params.orderId);
-  if (!order) return res.status(404).json({ error: "Pesanan tidak ditemukan." });
-  if (order.userId !== req.user.id && req.user.role !== "admin") return res.status(403).json({ error: "Tidak diizinkan." });
-  const entry = { from: req.user.role === "admin" ? "admin" : "buyer", text, date: new Date().toISOString() };
-  await update((data) => {
-    data.topengOrders.find((o) => o.id === req.params.orderId).chatLog.push(entry);
-  });
-  res.json({ entry });
-});
-
 router.get("/orders/:orderId/qris", requireAuth, async (req, res) => {
   const db = readDB();
   const order = db.topengOrders.find((o) => o.id === req.params.orderId);
@@ -188,7 +173,10 @@ router.patch("/:id", requireAuth, requireAdmin, async (req, res) => {
   const item = db.topeng.find((t) => t.id === req.params.id);
   if (!item) return res.status(404).json({ error: "Topeng tidak ditemukan." });
   await update((data) => {
-    Object.assign(data.topeng.find((t) => t.id === req.params.id), req.body);
+    const body = { ...req.body };
+    if (body.price !== undefined) body.price = Number(body.price);
+    if (body.stock !== undefined) body.stock = Number(body.stock) || 0;
+    Object.assign(data.topeng.find((t) => t.id === req.params.id), body);
   });
   res.json({ message: "Topeng diperbarui." });
 });

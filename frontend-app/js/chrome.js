@@ -14,13 +14,6 @@ const QUICK_FEATURES = [
   { icon: "announce", label: "Pengumuman", href: "#/announcements" },
   { icon: "gallery", label: "Galeri Sanggar", href: "#/gallery" },
   { icon: "facilities", label: "Semua Fasilitas", href: "#/facilities" },
-  { icon: "dance", label: "Kelas Tari", href: "#/facilities/les-tari-reguler" },
-  { icon: "music", label: "Karawitan", href: "#/facilities/les-karawitan" },
-  { icon: "ticket", label: "Kelas Wisata", href: "#/facilities/les-tari-wisata" },
-  { icon: "event", label: "Panggilan Pentas", href: "#/facilities/panggilan-tari" },
-  { icon: "school", label: "Kunjungan Edukasi", href: "#/facilities/kunjungan-edukasi" },
-  { icon: "costume", label: "Sewa Kostum", href: "#/facilities/sewa-kostum" },
-  { icon: "shop", label: "Beli Topeng", href: "#/topeng" },
   { icon: "forum", label: "Forum Diskusi", href: "#/forum" },
   { icon: "receipt", label: "Pesanan Saya", href: "#/my-orders" },
 ];

@@ -3,6 +3,12 @@ import { icon } from "./icons.js";
 // Change this if you deploy the backend somewhere other than localhost:4000.
 export const API_BASE = window.__API_BASE__ || "http://localhost:4000/api";
 
+// Nomor WhatsApp admin sanggar (format internasional tanpa + / 0 di depan). Ganti di sini bila berubah.
+export const ADMIN_WA = "6281234567890";
+export function waLink(text) {
+  return `https://wa.me/${ADMIN_WA}${text ? "?text=" + encodeURIComponent(text) : ""}`;
+}
+
 export function authToken() {
   return localStorage.getItem("asmoro_token");
 }

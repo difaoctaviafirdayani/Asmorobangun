@@ -417,3 +417,50 @@ input, select, textarea { font-family: inherit; }
 .topbar-row.topbar-center { position: relative; justify-content: center; min-height: 38px; }
 .topbar-row.topbar-center .icon-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
 .topbar-row.topbar-center .icon-btn + .icon-btn { right: 46px; }
+/* ---------- Header halaman (Galeri Sanggar, Fasilitas Kami) ---------- */
+.page-head { background: var(--wood-950); color: var(--cream-100); display: flex; align-items: center; gap: 12px; padding: 16px; position: sticky; top: 0; z-index: 30; }
+.page-head h2 { flex: 1; margin: 0; color: #fff; font-size: 1.15rem; }
+.page-head .icon-btn { width: 36px; height: 36px; border-radius: 50%; background: transparent; color: #fff; display: flex; align-items: center; justify-content: center; line-height: 0; }
+.page-head .icon-btn .ic { width: 22px; height: 22px; }
+
+/* ---------- Galeri: foto di atas, penjelasan di bawah ---------- */
+.gallery-grid.g-cards { padding: 16px; gap: 12px; align-items: start; }
+.g-card { background: var(--cream-100); border: 1.5px solid var(--wood-800); border-radius: 20px; padding: 8px 8px 12px; text-align: center; cursor: pointer; }
+.g-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 14px; display: block; background: var(--cream-300); }
+.g-card .g-title { font-weight: 700; font-size: 0.92rem; color: var(--wood-800); margin: 10px 4px 2px; }
+.g-card .g-text { font-size: 0.78rem; color: var(--wood-700); padding: 0 6px; line-height: 1.4; }
+
+/* ---------- Fasilitas: kartu foto kiri, teks kanan ---------- */
+.fac-list { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.fac-card { display: flex; gap: 10px; align-items: stretch; background: var(--cream-100); border: 1.5px solid var(--wood-800); border-radius: 16px; padding: 8px; color: inherit; }
+.fac-card img { width: 46%; flex-shrink: 0; height: 104px; object-fit: cover; border-radius: 10px; background: var(--cream-300); }
+.fac-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.fac-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+.fac-title { font-family: 'Margarine', 'Poppins', sans-serif; font-size: 0.92rem; color: var(--wood-900); line-height: 1.2; }
+.fac-rate { font-size: 0.72rem; font-weight: 600; color: var(--wood-800); white-space: nowrap; }
+.fac-rate .ic { width: 13px; height: 13px; color: var(--gold-400); vertical-align: -2px; }
+.fac-desc { font-size: 0.75rem; color: var(--wood-700); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+@media (min-width: 720px) { .fac-list { display: grid; grid-template-columns: 1fr 1fr; } }
+
+
+/* ===== Foto profil (halaman Akun) ===== */
+.avatar-wrap { position: relative; width: 96px; height: 96px; margin: 0 auto; }
+.avatar-circle {
+  width: 96px; height: 96px; border-radius: 50%; overflow: hidden;
+  background: var(--wood-800); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; font-family: 'Margarine', 'Poppins', sans-serif;
+  border: 3px solid var(--gold-300); box-shadow: var(--shadow-card);
+}
+.avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar-circle.is-loading { opacity: 0.45; }
+.avatar-edit {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--cream-100);
+  background: var(--wood-800); color: var(--cream-100);
+  display: flex; align-items: center; justify-content: center; padding: 0; line-height: 0;
+}
+.avatar-edit .ic { width: 18px; height: 18px; }
+.avatar-edit:hover { background: var(--wood-900); }
+.avatar-edit[disabled] { opacity: 0.5; }
+.avatar-actions { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }

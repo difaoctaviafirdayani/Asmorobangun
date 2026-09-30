@@ -1,5 +1,6 @@
 import { api, formatDate, formatRupiah, escapeHtml, assetUrl, showToast, fileUrl } from "../api.js";
 import { icon } from "../icons.js";
+import { statusField } from "../ui.js";
 
 const STATUS_OPTIONS = [
   "menunggu_pembayaran",
@@ -105,10 +106,7 @@ function openDetail(id) {
       ${b.paymentMethod ? `<div class="a-detail-row">${icon("card")} Metode: ${escapeHtml(b.paymentMethod)}</div>` : ""}
     </div>
     ${b.proofFile ? `<a href="${fileUrl(b.proofFile)}" target="_blank" class="a-btn a-btn-outline a-btn-sm" style="margin-top:10px">${icon("clip")} Lihat Bukti Pembayaran</a>` : ""}
-    <div class="a-field" style="margin-top:16px">
-      <label>Ubah status</label>
-      <select class="a-select" id="statusSelect" style="width:100%">${STATUS_OPTIONS.map((s) => `<option value="${s}" ${s === b.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}</select>
-    </div>
+    <div style="margin-top:16px">${statusField({ options: STATUS_OPTIONS, labels: STATUS_LABEL, current: b.status })}</div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="a-btn a-btn-ghost" id="closeDetail" style="flex:1;justify-content:center">Tutup</button>
       <button class="a-btn a-btn-primary" id="saveStatus" style="flex:1;justify-content:center">Simpan</button>

@@ -1,36 +1,34 @@
 import { icon } from "../icons.js";
-import { api, stars, escapeHtml } from "../api.js";
-import { topbar } from "../chrome.js";
-
-const ICONS = { "panggilan-tari": "event", "kunjungan-edukasi": "school", "les-tari-wisata": "ticket", "les-tari-reguler": "dance", "les-karawitan": "music", "sewa-kostum": "costume" };
+import { api, assetUrl, escapeHtml } from "../api.js";
 
 async function render(container) {
   container.innerHTML = `
-    <div class="topbar">
-      <div class="topbar-row">
-        <button class="icon-btn" data-nav="#/">${icon("back")}</button>
-        <div class="wordmark" style="font-size:1.05rem">Fasilitas Kami</div>
-        <button class="icon-btn" data-open-search aria-label="Cari">${icon("search")}</button>
-      </div>
+    <div class="page-head">
+      <button class="icon-btn" data-nav="#/" aria-label="Kembali">${icon("back")}</button>
+      <h2>Fasilitas Kami</h2>
+      <button class="icon-btn" data-open-search aria-label="Cari">${icon("search")}</button>
     </div>
-    <div class="section">
-      <p style="font-size:0.85rem;color:var(--ink-soft)">Dari kelas tari sekali coba sampai booking pentas untuk acara Anda — pilih layanan sanggar di bawah ini.</p>
-    </div>
-    <div class="tile-grid" id="tileGrid"><div class="empty-state">Memuat...</div></div>
+    <div class="fac-list" id="facList"><div class="empty-state">Memuat...</div></div>
   `;
   try {
     const { facilities } = await api("/facilities");
-    document.getElementById("tileGrid").innerHTML = facilities
+    document.getElementById("facList").innerHTML = facilities
       .map(
-        (f) => `<a class="tile" href="#/facilities/${f.id}">
-          <div class="t-icon">${icon(ICONS[f.id] || "facilities")}</div>
-          <div class="t-title">${escapeHtml(f.name)}</div>
-          <div class="t-sub">${escapeHtml(f.priceInfo.split("—")[0].split(".")[0])}</div>
-          ${f.avgRating ? `<div class="stars" style="font-size:0.7rem">${stars(f.avgRating)} (${f.reviewCount})</div>` : ""}
+        (f) => `<a class="fac-card" href="#/facilities/${f.id}">
+          <img src="${assetUrl(f.image, "assets/sanggar-tari.jpg")}" onerror="this.onerror=null;this.src='assets/sanggar-tari.jpg'" alt="" />
+          <div class="fac-body">
+            <div class="fac-top">
+              <div class="fac-title">${escapeHtml(f.name)}</div>
+              ${f.avgRating ? `<div class="fac-rate">${icon("star")} ${f.avgRating}</div>` : ""}
+            </div>
+            <div class="fac-desc">${escapeHtml(f.shortDesc)}</div>
+          </div>
         </a>`
       )
       .join("");
-  } catch (e) {}
+  } catch (e) {
+    document.getElementById("facList").innerHTML = `<div class="empty-state">Gagal memuat fasilitas.</div>`;
+  }
 }
 
 export default { nav: "facilities", render };

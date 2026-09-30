@@ -33,7 +33,7 @@ async function render(container, { id: tid }) {
           </div>
           <div class="field"><label>Nomor WhatsApp kamu</label><input id="buyerPhone" placeholder="08xxxxxxxxxx" /></div>
           <div class="field"><label>Catatan tambahan</label><textarea id="message" rows="2" placeholder="Pesan untuk admin (opsional)"></textarea></div>
-          <button class="btn btn-primary" id="submitOrderBtn">${icon("shop")} Pesan &amp; Lanjut Chat</button>
+          <button class="btn btn-primary" id="submitOrderBtn">${icon("shop")} Pesan &amp; Lanjut Pembayaran</button>
         </div>
       </div>
     `;
@@ -59,7 +59,7 @@ async function submitOrder(tid) {
   };
   try {
     const { order } = await api(`/topeng/${tid}/order`, { method: "POST", auth: true, body });
-    showToast("Pesanan dibuat, lanjut chat dengan admin!");
+    showToast("Pesanan dibuat, silakan lanjut ke pembayaran!");
     location.hash = `#/topeng/order/${order.id}`;
   } catch (err) {
     showToast(err.message);
