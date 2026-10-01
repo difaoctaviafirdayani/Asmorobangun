@@ -14,6 +14,7 @@ const QUICK_FEATURES = [
   { icon: "announce", label: "Pengumuman", href: "#/announcements" },
   { icon: "gallery", label: "Galeri Sanggar", href: "#/gallery" },
   { icon: "facilities", label: "Semua Fasilitas", href: "#/facilities" },
+  { icon: "topeng", label: "Beli Topeng", href: "#/topeng" }, // ← BARU: mengarah ke halaman Topeng
   { icon: "forum", label: "Forum Diskusi", href: "#/forum" },
   { icon: "receipt", label: "Pesanan Saya", href: "#/my-orders" },
 ];
